@@ -35,6 +35,34 @@
         </div>
       </section>
 
+      <!-- Monthly Budget -->
+      <section class="card budget-card" aria-label="Monthly budget">
+        <h2 class="section-title">Monthly Budget</h2>
+
+        <div id="budget-empty-state" class="budget-state">
+          <button type="button" id="budget-set" class="btn-budget btn-budget-primary">Set a monthly budget</button>
+        </div>
+
+        <div id="budget-form-state" class="budget-state hidden">
+          <label for="budget-input">Monthly budget (&#x20B1;)</label>
+          <div class="budget-input-row">
+            <input type="number" id="budget-input" min="0.01" step="0.01" placeholder="0.00" inputmode="decimal" />
+            <button type="button" id="budget-save" class="btn-budget btn-budget-primary">Save</button>
+          </div>
+          <span id="budget-error" class="field-error"></span>
+        </div>
+
+        <div id="budget-active-state" class="budget-state hidden">
+          <div class="budget-status-row">
+            <p id="budget-status" class="budget-status"></p>
+            <button type="button" id="budget-edit" class="btn-budget btn-budget-secondary">Edit</button>
+          </div>
+          <div class="progress-bar" role="progressbar" aria-label="Monthly budget used" aria-valuemin="0" aria-valuemax="100">
+            <div id="progress-fill" class="progress-fill"></div>
+          </div>
+        </div>
+      </section>
+
       <!-- Add Expense Form -->
       <section class="card form-card">
         <h2 class="section-title">Add Expense</h2>
@@ -52,7 +80,7 @@
           </div>
 
           <div class="form-group">
-            <label for="amount">Amount (&#x20B1;)</label>
+            <label for="amount">Price each (&#x20B1;)</label>
             <input
               type="number"
               id="amount"
@@ -65,13 +93,30 @@
           </div>
 
           <div class="form-group">
+            <label for="quantity">Quantity</label>
+            <input
+              type="number"
+              id="quantity"
+              min="1"
+              step="1"
+              value="1"
+              required
+            />
+            <span class="field-error" id="error-quantity"></span>
+          </div>
+
+          <div class="form-group">
             <label for="category">Category</label>
             <select id="category" required>
               <option value="" disabled selected>Select a category</option>
               <option value="Food">&#x1F354; Food</option>
               <option value="Transport">&#x1F68C; Transport</option>
-              <option value="Books">&#x1F4DA; Books</option>
-              <option value="Entertainment">&#x1F3AC; Entertainment</option>
+              <option value="Load &amp; Data">&#x1F4F1; Load &amp; Data</option>
+              <option value="School">&#x1F393; School</option>
+              <option value="Bills">&#x1F9FE; Bills</option>
+              <option value="Shopping">&#x1F6CD;&#xFE0F; Shopping</option>
+              <option value="Health">&#x1F3E5; Health</option>
+              <option value="Fun">&#x1F389; Fun</option>
               <option value="Other">&#x1F4E6; Other</option>
             </select>
             <span class="field-error" id="error-category"></span>
@@ -92,8 +137,12 @@
               <option value="">All Categories</option>
               <option value="Food">&#x1F354; Food</option>
               <option value="Transport">&#x1F68C; Transport</option>
-              <option value="Books">&#x1F4DA; Books</option>
-              <option value="Entertainment">&#x1F3AC; Entertainment</option>
+              <option value="Load &amp; Data">&#x1F4F1; Load &amp; Data</option>
+              <option value="School">&#x1F393; School</option>
+              <option value="Bills">&#x1F9FE; Bills</option>
+              <option value="Shopping">&#x1F6CD;&#xFE0F; Shopping</option>
+              <option value="Health">&#x1F3E5; Health</option>
+              <option value="Fun">&#x1F389; Fun</option>
               <option value="Other">&#x1F4E6; Other</option>
             </select>
           </div>

@@ -161,6 +161,87 @@ body {
 }
 
 /* =============================================
+   Monthly Budget
+   ============================================= */
+.budget-card,
+.budget-state {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.budget-state.hidden {
+  display: none;
+}
+
+.budget-input-row,
+.budget-status-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.budget-input-row input {
+  flex: 1;
+  min-width: 0;
+}
+
+.btn-budget {
+  min-height: 44px;
+  padding: 0.7rem 1rem;
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-budget-primary {
+  width: 100%;
+  background: var(--color-primary);
+  color: var(--color-primary-text);
+}
+
+.budget-input-row .btn-budget-primary {
+  width: auto;
+}
+
+.btn-budget-secondary {
+  flex-shrink: 0;
+  border-color: var(--color-border);
+  background: transparent;
+  color: var(--color-text);
+}
+
+.budget-status {
+  min-width: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 0.55rem;
+  margin-top: 0.75rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--color-badge-bg);
+}
+
+.progress-fill {
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  transition: width var(--transition), background var(--transition);
+}
+
+.progress-green { background: #16a34a; }
+.progress-orange { background: #f97316; }
+.progress-red { background: #dc2626; }
+
+/* =============================================
    Form
    ============================================= */
 .form-group {
@@ -189,6 +270,11 @@ select {
   transition: border-color var(--transition), box-shadow var(--transition);
   appearance: none;
   -webkit-appearance: none;
+}
+
+#quantity {
+  width: 100%;
+  box-sizing: border-box;
 }
 
 input::placeholder { color: var(--color-muted); }
@@ -288,6 +374,11 @@ select {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.expense-quantity {
+  font-size: 0.8rem;
+  color: var(--color-muted);
 }
 
 .expense-meta {
