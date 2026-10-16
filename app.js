@@ -629,3 +629,7 @@ function init() {
 
 // Entry point — safe to call even if the script loads before some elements
 document.addEventListener("DOMContentLoaded", init);
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("./sw.js")
+}
