@@ -59,6 +59,18 @@ function loadBudget() {
    ============================================= */
 
 /**
+ * Returns today's local date in YYYY-MM-DD format.
+ * @returns {string}
+ */
+function getTodayISO() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+/**
  * Returns a Date set to midnight (00:00:00.000) of the given date
  * in local time — used for clean day-boundary comparisons.
  * @param {Date} d
@@ -185,16 +197,17 @@ function renderBudget(monthTotal, budgetUi) {
  * @param {HTMLElement} categorySel
  * @returns {boolean} true when all fields pass
  */
-function validateForm(nameInput, amountInput, quantityInput, categorySel) {
+function validateForm(nameInput, amountInput, quantityInput, dateInput, categorySel) {
   let valid = true;
 
   const errorName     = document.getElementById("error-name");
   const errorAmount   = document.getElementById("error-amount");
   const errorQuantity = document.getElementById("error-quantity");
+  const errorDate     = document.getElementById("error-date");
   const errorCategory = document.getElementById("error-category");
 
-  [nameInput, amountInput, quantityInput, categorySel].forEach(el => el.classList.remove("invalid"));
-  [errorName, errorAmount, errorQuantity, errorCategory].forEach(el => (el.textContent = ""));
+  [nameInput, amountInput, quantityInput, dateInput, categorySel].forEach(el => el.classList.remove("invalid"));
+  [errorName, errorAmount, errorQuantity, errorDate, errorCategory].forEach(el => (el.textContent = ""));
 
   if (!nameInput.value.trim()) {
     nameInput.classList.add("invalid");
@@ -213,6 +226,16 @@ function validateForm(nameInput, amountInput, quantityInput, categorySel) {
   if (!quantityInput.value || isNaN(qty) || qty < 1) {
     quantityInput.classList.add("invalid");
     errorQuantity.textContent = "Please tell us how many you bought.";
+    valid = false;
+  }
+
+  if (!dateInput.value) {
+    dateInput.classList.add("invalid");
+    errorDate.textContent = "Please select a date.";
+    valid = false;
+  } else if (new Date(dateInput.value) > new Date()) {
+    dateInput.classList.add("invalid");
+    errorDate.textContent = "Future dates are not allowed.";
     valid = false;
   }
 
@@ -309,7 +332,21 @@ function renderList(expenses, listEl, emptyEl, categoryFilter = "") {
   }
 
   emptyEl.classList.add("hidden");
-  [...visibleExpenses].reverse().forEach(exp => listEl.appendChild(createExpenseItem(exp)));
+  [...visibleExpenses]
+    .sort((a, b) => {
+      const dateA = a.date.substring(0, 10);
+      const dateB = b.date.substring(0, 10);
+      const dateDiff = dateB.localeCompare(dateA);
+
+      if (dateDiff !== 0) {
+        return dateDiff;
+      }
+
+      // Tie-breaker: use the original index in the full expenses array
+      // so the most recently added item (higher index) comes first.
+      return expenses.indexOf(b) - expenses.indexOf(a);
+    })
+    .forEach(exp => listEl.appendChild(createExpenseItem(exp)));
 }
 
 /* =============================================
@@ -327,6 +364,7 @@ function init() {
   const nameInput   = document.getElementById("item-name");
   const amountInput = document.getElementById("amount");
   const quantityInput = document.getElementById("quantity");
+  const dateInput   = document.getElementById("expense-date");
   const categorySel = document.getElementById("category");
   const expenseList = document.getElementById("expense-list");
   const emptyState  = document.getElementById("empty-state");
@@ -388,7 +426,10 @@ function init() {
   const resetExpenseForm = () => {
     editId = null;
     form.reset();
-    [nameInput, amountInput, quantityInput, categorySel].forEach(el => el.classList.remove("invalid"));
+    const today = getTodayISO();
+    dateInput.value = today;
+    dateInput.max = today;
+    [nameInput, amountInput, quantityInput, dateInput, categorySel].forEach(el => el.classList.remove("invalid"));
     form.querySelectorAll(".field-error").forEach(el => (el.textContent = ""));
     submitButton.textContent = "Add Expense";
     cancelButton.classList.add("hidden");
@@ -413,6 +454,8 @@ function init() {
     nameInput.value = expense.name;
     amountInput.value = expense.amount;
     quantityInput.value = expense.quantity || 1;
+    // Extract YYYY-MM-DD from date string (ISO or YYYY-MM-DD)
+    dateInput.value = expense.date.includes("T") ? expense.date.split("T")[0] : expense.date;
     categorySel.value = Object.hasOwn(CATEGORY_ICONS, expense.category)
       ? expense.category
       : "Other";
@@ -497,12 +540,13 @@ function init() {
   form.addEventListener("submit", (e) => {
     e.preventDefault();
 
-    if (!validateForm(nameInput, amountInput, quantityInput, categorySel)) return;
+    if (!validateForm(nameInput, amountInput, quantityInput, dateInput, categorySel)) return;
 
     const expenseData = {
       name:     nameInput.value.trim(),
       amount:   parseFloat(parseFloat(amountInput.value).toFixed(2)),
       quantity: parseInt(quantityInput.value, 10),
+      date:     dateInput.value,
       category: categorySel.value,
     };
 
@@ -514,7 +558,6 @@ function init() {
       expenses.push({
         id: crypto.randomUUID(),
         ...expenseData,
-        date: new Date().toISOString(),
       });
     }
 
@@ -527,11 +570,14 @@ function init() {
   });
 
   // ── Clear invalid styling as user corrects each field ─────────────────
-  [nameInput, amountInput, quantityInput, categorySel].forEach(el => {
+  [nameInput, amountInput, quantityInput, dateInput, categorySel].forEach(el => {
     el.addEventListener("input", () => el.classList.remove("invalid"));
   });
 
   // ── Boot: restore list + summary from localStorage ────────────────────
+  const today = getTodayISO();
+  dateInput.value = today;
+  dateInput.max = today;
   const saved = loadExpenses();
   renderCurrentList(saved);
   updateCurrentSummary(saved);
