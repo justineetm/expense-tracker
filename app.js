@@ -154,20 +154,20 @@ function validateForm(nameInput, amountInput, categorySel) {
 
   if (!nameInput.value.trim()) {
     nameInput.classList.add("invalid");
-    errorName.textContent = "Please enter an item name.";
+    errorName.textContent = "Please tell us what you bought.";
     valid = false;
   }
 
   const amt = parseFloat(amountInput.value);
   if (!amountInput.value || isNaN(amt) || amt <= 0) {
     amountInput.classList.add("invalid");
-    errorAmount.textContent = "Please enter a valid amount greater than \u20B10.";
+    errorAmount.textContent = "Please enter an amount greater than \u20B10.";
     valid = false;
   }
 
   if (!categorySel.value) {
     categorySel.classList.add("invalid");
-    errorCategory.textContent = "Please select a category.";
+    errorCategory.textContent = "Please choose a category so we can keep things organized.";
     valid = false;
   }
 
