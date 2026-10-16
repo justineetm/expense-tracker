@@ -144,21 +144,30 @@
       <section class="card list-card">
         <div class="list-header">
           <h2 class="section-title">Spending List</h2>
-          <!-- Category filter -->
-          <div class="filter-bar">
-            <label for="filter-category" class="filter-label">Filter</label>
-            <select id="filter-category" class="filter-select">
-              <option value="">All Categories</option>
-              <option value="Food">&#x1F354; Food</option>
-              <option value="Transport">&#x1F68C; Transport</option>
-              <option value="Load &amp; Data">&#x1F4F1; Load &amp; Data</option>
-              <option value="School">&#x1F393; School</option>
-              <option value="Bills">&#x1F9FE; Bills</option>
-              <option value="Shopping">&#x1F6CD;&#xFE0F; Shopping</option>
-              <option value="Health">&#x1F3E5; Health</option>
-              <option value="Fun">&#x1F389; Fun</option>
-              <option value="Other">&#x1F4E6; Other</option>
-            </select>
+          <!-- Controls area -->
+          <div class="list-controls">
+            <div class="filter-bar">
+              <label for="filter-category" class="filter-label">Filter</label>
+              <select id="filter-category" class="filter-select">
+                <option value="">All Categories</option>
+                <option value="Food">&#x1F354; Food</option>
+                <option value="Transport">&#x1F68C; Transport</option>
+                <option value="Load &amp; Data">&#x1F4F1; Load &amp; Data</option>
+                <option value="School">&#x1F393; School</option>
+                <option value="Bills">&#x1F9FE; Bills</option>
+                <option value="Shopping">&#x1F6CD;&#xFE0F; Shopping</option>
+                <option value="Health">&#x1F3E5; Health</option>
+                <option value="Fun">&#x1F389; Fun</option>
+                <option value="Other">&#x1F4E6; Other</option>
+              </select>
+            </div>
+            <button
+              type="button"
+              id="btn-export"
+              class="btn-secondary btn-icon"
+              title="Export CSV"
+              aria-label="Export CSV"
+            >&#x1F4E5;</button>
           </div>
         </div>
         <ul id="expense-list" class="expense-list"></ul>

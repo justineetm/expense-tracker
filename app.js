@@ -369,6 +369,7 @@ function init() {
   const expenseList = document.getElementById("expense-list");
   const emptyState  = document.getElementById("empty-state");
   const filterSel   = document.getElementById("filter-category");
+  const exportButton = document.getElementById("btn-export");
   const themeToggle = document.getElementById("theme-toggle");
   const submitButton = form.querySelector('button[type="submit"]');
   const cancelButton = document.getElementById("btn-cancel");
@@ -499,6 +500,42 @@ function init() {
     renderCurrentList(loadExpenses());
   });
 
+  exportButton.addEventListener("click", () => {
+    const expenses = loadExpenses();
+    if (expenses.length === 0) {
+      alert("No expenses to export yet!");
+      return;
+    }
+
+    // CSV Headers & BOM for Excel emoji support
+    let csvContent = "\uFEFFDate,Item,Category,Price Each,Quantity,Total\n";
+
+    expenses.forEach(exp => {
+      const date = exp.date.substring(0, 10);
+      const name = `"${exp.name.replace(/"/g, '""')}"`;
+      const isKnownCategory = Object.hasOwn(CATEGORY_ICONS, exp.category);
+      const catText = isKnownCategory ? exp.category : "Other";
+      const icon = CATEGORY_ICONS[catText];
+      const category = `"${icon} ${catText}"`;
+      const price = exp.amount.toFixed(2);
+      const qty = exp.quantity || 1;
+      const total = (exp.amount * qty).toFixed(2);
+
+      csvContent += `${date},${name},${category},${price},${qty},${total}\n`;
+    });
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `expenses-${getTodayISO()}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  });
+
   // ── Delete handler (event delegation on the list) ─────────────────────
   expenseList.addEventListener("click", (e) => {
     const btn = e.target.closest(".btn-delete");
@@ -581,6 +618,13 @@ function init() {
   const saved = loadExpenses();
   renderCurrentList(saved);
   updateCurrentSummary(saved);
+
+  // Prevent scroll wheel from changing number inputs
+  document.addEventListener("wheel", (e) => {
+    if (document.activeElement.type === "number") {
+      document.activeElement.blur();
+    }
+  });
 }
 
 // Entry point — safe to call even if the script loads before some elements
