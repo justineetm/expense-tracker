@@ -122,7 +122,10 @@
             <span class="field-error" id="error-category"></span>
           </div>
 
-          <button type="submit" class="btn-primary">Add Expense</button>
+          <div class="form-actions">
+            <button type="submit" class="btn-primary">Add Expense</button>
+            <button type="button" id="btn-cancel" class="btn-cancel hidden">Cancel</button>
+          </div>
         </form>
       </section>
 
@@ -150,6 +153,11 @@
         <ul id="expense-list" class="expense-list"></ul>
         <p id="empty-state" class="empty-state">No expenses yet. Add one above!</p>
       </section>
+    </div>
+
+    <div id="toast" class="hidden" role="status" aria-live="polite">
+      <span>Expense deleted.</span>
+      <button type="button" id="btn-undo">Undo</button>
     </div>
 
     <script src="app.js"></script>

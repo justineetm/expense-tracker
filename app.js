@@ -332,6 +332,10 @@ function init() {
   const emptyState  = document.getElementById("empty-state");
   const filterSel   = document.getElementById("filter-category");
   const themeToggle = document.getElementById("theme-toggle");
+  const submitButton = form.querySelector('button[type="submit"]');
+  const cancelButton = document.getElementById("btn-cancel");
+  const toast = document.getElementById("toast");
+  const undoButton = document.getElementById("btn-undo");
   const budgetUi = {
     emptyState: document.getElementById("budget-empty-state"),
     formState: document.getElementById("budget-form-state"),
@@ -345,6 +349,9 @@ function init() {
   const budgetSetButton = document.getElementById("budget-set");
   const budgetEditButton = document.getElementById("budget-edit");
   const budgetSaveButton = document.getElementById("budget-save");
+  let editId = null;
+  let pendingDeletion = null;
+  let toastTimer = null;
 
   const applyTheme = (theme) => {
     const isDark = theme === "dark";
@@ -376,6 +383,43 @@ function init() {
 
   const updateCurrentSummary = (expenses) => {
     updateSummary(expenses, budgetUi);
+  };
+
+  const resetExpenseForm = () => {
+    editId = null;
+    form.reset();
+    [nameInput, amountInput, quantityInput, categorySel].forEach(el => el.classList.remove("invalid"));
+    form.querySelectorAll(".field-error").forEach(el => (el.textContent = ""));
+    submitButton.textContent = "Add Expense";
+    cancelButton.classList.add("hidden");
+  };
+
+  const hideToast = () => {
+    toast.classList.add("hidden");
+    pendingDeletion = null;
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = null;
+  };
+
+  const showToast = (expense, index) => {
+    pendingDeletion = { expense, index };
+    toast.classList.remove("hidden");
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(hideToast, 5000);
+  };
+
+  const startEdit = (expense) => {
+    editId = expense.id;
+    nameInput.value = expense.name;
+    amountInput.value = expense.amount;
+    quantityInput.value = expense.quantity || 1;
+    categorySel.value = Object.hasOwn(CATEGORY_ICONS, expense.category)
+      ? expense.category
+      : "Other";
+    submitButton.textContent = "Save changes";
+    cancelButton.classList.remove("hidden");
+    form.scrollIntoView({ behavior: "smooth", block: "start" });
+    nameInput.focus();
   };
 
   const showBudgetForm = () => {
@@ -415,13 +459,39 @@ function init() {
   // ── Delete handler (event delegation on the list) ─────────────────────
   expenseList.addEventListener("click", (e) => {
     const btn = e.target.closest(".btn-delete");
-    if (!btn) return;
+    if (btn) {
+      const expenses = loadExpenses();
+      const index = expenses.findIndex(exp => exp.id === btn.dataset.id);
+      if (index === -1) return;
 
-    const updated = loadExpenses().filter(exp => exp.id !== btn.dataset.id);
-    saveExpenses(updated);
-    renderCurrentList(updated);
-    updateCurrentSummary(updated);
+      const [deletedExpense] = expenses.splice(index, 1);
+      saveExpenses(expenses);
+      renderCurrentList(expenses);
+      updateCurrentSummary(expenses);
+      showToast(deletedExpense, index);
+      return;
+    }
+
+    const item = e.target.closest(".expense-item");
+    if (!item) return;
+
+    const expense = loadExpenses().find(exp => exp.id === item.dataset.id);
+    if (expense) startEdit(expense);
   });
+
+  undoButton.addEventListener("click", () => {
+    if (!pendingDeletion) return;
+
+    const { expense, index } = pendingDeletion;
+    const expenses = loadExpenses();
+    expenses.splice(Math.min(index, expenses.length), 0, expense);
+    saveExpenses(expenses);
+    renderCurrentList(expenses);
+    updateCurrentSummary(expenses);
+    hideToast();
+  });
+
+  cancelButton.addEventListener("click", resetExpenseForm);
 
   // ── Form submit handler ───────────────────────────────────────────────
   form.addEventListener("submit", (e) => {
@@ -429,22 +499,30 @@ function init() {
 
     if (!validateForm(nameInput, amountInput, quantityInput, categorySel)) return;
 
-    const expense = {
-      id:       crypto.randomUUID(),
+    const expenseData = {
       name:     nameInput.value.trim(),
       amount:   parseFloat(parseFloat(amountInput.value).toFixed(2)),
       quantity: parseInt(quantityInput.value, 10),
       category: categorySel.value,
-      date:     new Date().toISOString(),
     };
 
     const expenses = loadExpenses();
-    expenses.push(expense);
+    if (editId) {
+      const index = expenses.findIndex(exp => exp.id === editId);
+      if (index !== -1) expenses[index] = { ...expenses[index], ...expenseData };
+    } else {
+      expenses.push({
+        id: crypto.randomUUID(),
+        ...expenseData,
+        date: new Date().toISOString(),
+      });
+    }
+
     saveExpenses(expenses);
     renderCurrentList(expenses);
     updateCurrentSummary(expenses);
 
-    form.reset();
+    resetExpenseForm();
     nameInput.focus();
   });
 
