@@ -1,0 +1,502 @@
+﻿b/* =============================================
+   Reset & Base
+   ============================================= */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --color-bg:         #f4f6f9;
+  --color-surface:    #ffffff;
+  --color-input:      #ffffff;
+  --color-primary:    #4f46e5;
+  --color-primary-hv: #4338ca;
+  --color-primary-text: #ffffff;
+  --color-focus:      rgba(79, 70, 229, 0.15);
+  --color-text:       #1e293b;
+  --color-muted:      #64748b;
+  --color-border:     #e2e8f0;
+  --color-error:      #ef4444;
+  --color-badge-bg:   #ede9fe;
+  --color-badge-txt:  #6d28d9;
+  --color-summary-start: #4f46e5;
+  --color-summary-end:   #6366f1;
+  --color-danger-surface: #fee2e2;
+  --color-danger-surface-active: #fecaca;
+
+  --radius:    12px;
+  --radius-sm: 8px;
+  --shadow:    0 2px 12px rgba(0,0,0,0.08);
+  --transition: 0.18s ease;
+}
+
+[data-theme="dark"] {
+  --color-bg:         #121212;
+  --color-surface:    #1e1e1e;
+  --color-input:      #181818;
+  --color-primary:    #d4d4d4;
+  --color-primary-hv: #f5f5f5;
+  --color-primary-text: #121212;
+  --color-focus:      rgba(212, 212, 212, 0.2);
+  --color-text:       #f5f5f5;
+  --color-muted:      #b3b3b3;
+  --color-border:     #333333;
+  --color-error:      #fca5a5;
+  --color-badge-bg:   #2a2a2a;
+  --color-badge-txt:  #e5e5e5;
+  --color-summary-start: #3a3a3a;
+  --color-summary-end:   #4a4a4a;
+  --color-danger-surface: #451a1a;
+  --color-danger-surface-active: #7f1d1d;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+               "Helvetica Neue", Arial, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+  min-height: 100dvh;
+  padding-bottom: 2rem;
+}
+
+/* =============================================
+   Layout
+   ============================================= */
+.container {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* =============================================
+   Header
+   ============================================= */
+.app-header {
+  text-align: center;
+  padding: 2rem 0 1.25rem;
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.app-header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  margin-top: 0.25rem;
+  font-size: 0.9rem;
+  color: var(--color-muted);
+}
+
+.btn-theme {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 1.5px solid var(--color-border);
+  border-radius: 50%;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition), transform var(--transition);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-theme:hover {
+  border-color: var(--color-primary);
+  background: var(--color-badge-bg);
+}
+
+.btn-theme:active {
+  transform: scale(0.92);
+}
+
+.btn-theme:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* =============================================
+   Cards
+   ============================================= */
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.section-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 1.1rem;
+}
+
+/* =============================================
+   Form
+   ============================================= */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+}
+
+label {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+input[type="text"],
+input[type="number"],
+select {
+  width: 100%;
+  padding: 0.65rem 0.875rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  color: var(--color-text);
+  background: var(--color-input);
+  transition: border-color var(--transition), box-shadow var(--transition);
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+input::placeholder { color: var(--color-muted); }
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-focus);
+}
+
+input.invalid,
+select.invalid {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
+}
+
+/* Custom select arrow */
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2.25rem;
+}
+
+.field-error {
+  font-size: 0.78rem;
+  color: var(--color-error);
+  min-height: 1em;
+}
+
+.btn-primary {
+  display: block;
+  width: 100%;
+  padding: 0.8rem;
+  margin-top: 0.5rem;
+  background: var(--color-primary);
+  color: var(--color-primary-text);
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  transition: background var(--transition), transform var(--transition);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-primary:hover  { background: var(--color-primary-hv); }
+.btn-primary:active { transform: scale(0.98); }
+
+/* =============================================
+   Expense List
+   ============================================= */
+.expense-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.expense-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  animation: slide-in 0.22s ease;
+}
+
+@keyframes slide-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.expense-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.expense-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.expense-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.expense-date {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+}
+
+.expense-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: var(--color-badge-bg);
+  color: var(--color-badge-txt);
+  white-space: nowrap;
+}
+
+.expense-amount {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  padding: 1rem 0 0.25rem;
+}
+
+.empty-state.hidden { display: none; }
+
+/* =============================================
+   Wider screens
+   ============================================= */
+@media (min-width: 600px) {
+  .app-header { padding-top: 2.5rem; }
+  .app-header h1 { font-size: 2rem; }
+  .card { padding: 2rem; }
+}
+
+/* =============================================
+   Summary Cards
+   ============================================= */
+
+/* Two-column grid that sits above the form */
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.875rem;
+  margin-bottom: 1.25rem;
+}
+
+.summary-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 1.1rem 0.75rem;
+  background: var(--color-primary);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  text-align: center;
+  /* subtle gradient tint */
+  background: linear-gradient(135deg, var(--color-summary-start) 0%, var(--color-summary-end) 100%);
+}
+
+.summary-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.80);
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.summary-amount {
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+}
+
+/* On very narrow screens (< 320 px) stack the cards */
+@media (max-width: 319px) {
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =============================================
+   Delete Button & Expense Right Column
+   ============================================= */
+
+/*
+ * Wrap the amount + delete button so they sit together
+ * as a tight right-aligned group inside each expense row.
+ */
+.expense-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.btn-delete {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--color-muted);
+  transition: background var(--transition), color var(--transition),
+              transform var(--transition);
+  -webkit-tap-highlight-color: transparent;
+  /* Increase tap area on mobile without changing visual size */
+  position: relative;
+}
+
+.btn-delete::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+}
+
+.btn-delete:hover {
+  background: var(--color-danger-surface);
+  color: var(--color-error);
+}
+
+.btn-delete:active {
+  transform: scale(0.88);
+  background: var(--color-danger-surface-active);
+}
+
+/* =============================================
+   Filter Bar  (inside list card)
+   ============================================= */
+
+/*
+ * .list-header: row that holds the "Spending List" title and
+ * the filter bar side-by-side, aligning to opposite ends.
+ */
+.list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1.1rem;
+  flex-wrap: wrap;      /* wraps on very narrow screens */
+}
+
+/* The section-title inside list-header loses its bottom-margin
+   since spacing is handled by .list-header's margin-bottom instead. */
+.list-header .section-title {
+  margin-bottom: 0;
+}
+
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.filter-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+
+.filter-select {
+  /* Override the shared input/select width:100% rule */
+  width: auto;
+  max-width: 11rem;
+  padding: 0.4rem 2rem 0.4rem 0.65rem;   /* right padding leaves room for arrow */
+  font-size: 0.82rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  background: var(--color-input);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.55rem center;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-focus);
+}
+
+/* Keep the filter easy to use on narrow mobile screens. */
+@media (max-width: 420px) {
+  .list-header {
+    align-items: stretch;
+  }
+
+  .filter-bar {
+    width: 100%;
+  }
+
+  .filter-select {
+    flex: 1;
+    max-width: none;
+  }
+}

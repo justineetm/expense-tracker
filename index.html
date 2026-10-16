@@ -1,0 +1,108 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Expense Tracker</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header class="app-header">
+        <div class="header-row">
+          <h1>&#x1F4B8; Expense Tracker</h1>
+          <button
+            type="button"
+            id="theme-toggle"
+            class="btn-theme"
+            aria-label="Switch to dark mode"
+            aria-pressed="false"
+            title="Switch to dark mode"
+          >&#x1F319;</button>
+        </div>
+        <p class="subtitle">Track where your money goes</p>
+      </header>
+
+      <!-- Summary Cards -->
+      <section class="summary-grid" aria-label="Spending summary">
+        <div class="summary-card" id="summary-week">
+          <span class="summary-label">&#x1F4C5; This Week</span>
+          <span class="summary-amount" id="total-week">&#x20B1;0.00</span>
+        </div>
+        <div class="summary-card" id="summary-month">
+          <span class="summary-label">&#x1F4C6; This Month</span>
+          <span class="summary-amount" id="total-month">&#x20B1;0.00</span>
+        </div>
+      </section>
+
+      <!-- Add Expense Form -->
+      <section class="card form-card">
+        <h2 class="section-title">Add Expense</h2>
+        <form id="expense-form" novalidate>
+          <div class="form-group">
+            <label for="item-name">Item Name</label>
+            <input
+              type="text"
+              id="item-name"
+              placeholder="e.g. Coffee, Bus ticket..."
+              maxlength="60"
+              required
+            />
+            <span class="field-error" id="error-name"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="amount">Amount (&#x20B1;)</label>
+            <input
+              type="number"
+              id="amount"
+              placeholder="0.00"
+              min="0.01"
+              step="0.01"
+              required
+            />
+            <span class="field-error" id="error-amount"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="category">Category</label>
+            <select id="category" required>
+              <option value="" disabled selected>Select a category</option>
+              <option value="Food">&#x1F354; Food</option>
+              <option value="Transport">&#x1F68C; Transport</option>
+              <option value="Books">&#x1F4DA; Books</option>
+              <option value="Entertainment">&#x1F3AC; Entertainment</option>
+              <option value="Other">&#x1F4E6; Other</option>
+            </select>
+            <span class="field-error" id="error-category"></span>
+          </div>
+
+          <button type="submit" class="btn-primary">Add Expense</button>
+        </form>
+      </section>
+
+      <!-- Expense List -->
+      <section class="card list-card">
+        <div class="list-header">
+          <h2 class="section-title">Spending List</h2>
+          <!-- Category filter -->
+          <div class="filter-bar">
+            <label for="filter-category" class="filter-label">Filter</label>
+            <select id="filter-category" class="filter-select">
+              <option value="">All Categories</option>
+              <option value="Food">&#x1F354; Food</option>
+              <option value="Transport">&#x1F68C; Transport</option>
+              <option value="Books">&#x1F4DA; Books</option>
+              <option value="Entertainment">&#x1F3AC; Entertainment</option>
+              <option value="Other">&#x1F4E6; Other</option>
+            </select>
+          </div>
+        </div>
+        <ul id="expense-list" class="expense-list"></ul>
+        <p id="empty-state" class="empty-state">No expenses yet. Add one above!</p>
+      </section>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
