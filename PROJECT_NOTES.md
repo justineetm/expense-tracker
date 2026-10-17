@@ -45,8 +45,22 @@ PeraLog is a client-side expense tracker PWA. All data is stored in localStorage
 - Weekly & monthly summary cards with budget progress bar (green/orange/red thresholds)
 - Form validation with inline error messages
 - Dark/light theme toggle (persisted in localStorage)
-- Service Worker: `peralog-v8` cache for offline support
+- Service Worker: `peralog-v9` cache for offline support
 
+
+## Collapsible Add Expense Accordion
+- The add expense form is now a collapsible accordion on mobile.
+- Wrapper uses CSS grid animation: `grid-template-rows: 0fr` (collapsed) → `1fr` (open) with `overflow: hidden` and `min-height: 0` on the form.
+- Toggle button (`#expense-toggle`) is full-width, 48px min tap target, with `aria-expanded` and `aria-controls` pointing to the form wrapper.
+- Form container (`#expense-form-collapsible`) starts with `inert` attribute — fields are not reachable by Tab until opened.
+- Always starts collapsed on load; no state remembered between visits.
+- On open, focuses `#item-name` with `{ preventScroll: true }` after a 400ms timeout (or immediately if `prefers-reduced-motion` is on).
+- On successful save: collapses accordion, shows `#info-toast` ("Expense added" / "Expense updated" for edits).
+- Validation errors keep the form open; error messages and Save button are not clipped.
+- Edit mode: tapping a row expands the form, pre-fills fields, scrolls into view, and changes toggle label to "Edit expense".
+- Cancel button collapses accordion and resets the form/labels.
+- Tapping the toggle while editing cancels the edit and returns to add mode.
+- Selection mode hides the toggle bar entirely; if selection starts while editing, the edit is cancelled and the form collapsed first.
 ## Files
 - `index.html` — HTML structure
 - `app.js` — Application logic (~1195 lines)

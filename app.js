@@ -530,7 +530,66 @@ function init() {
   const themeToggle = document.getElementById("theme-toggle");
   const submitButton = form.querySelector('button[type="submit"]');
   const cancelButton = document.getElementById("btn-cancel");
+  const expenseToggle = document.getElementById("expense-toggle");
+  const expenseCollapsible = document.getElementById("expense-form-collapsible");
   const selectButton = document.getElementById("btn-select");
+
+  // Accordion state
+  let accordionOpen = false;
+
+  // ── Accordion: expand/collapse expense form ────────────────────────────
+  const toggleAccordion = () => {
+    const isReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // If closed and editing, cancel edit, reset form, collapse
+    if (!accordionOpen && editId) {
+      editId = null;
+      expenseCollapsible.setAttribute("aria-expanded", "false");
+      expenseCollapsible.setAttribute("inert", "");
+      form.reset();
+      cancelButton.classList.add("hidden");
+      submitButton.textContent = "Add Expense";
+      form.querySelectorAll(".field-error").forEach(el => (el.textContent = ""));
+      return;
+    }
+
+    accordionOpen = !accordionOpen;
+    expenseCollapsible.setAttribute("aria-expanded", accordionOpen);
+
+    if (accordionOpen) {
+      expenseToggle.setAttribute("aria-expanded", "true");
+      expenseCollapsible.removeAttribute("inert");
+      form.querySelectorAll(".field-error").forEach(el => (el.textContent = ""));
+      submitButton.textContent = editId ? "Save changes" : "Add Expense";
+      cancelButton.classList.toggle("hidden", !editId);
+
+      if (editId) {
+        // In edit mode: expand, pre-fill, scroll into view, focus first field
+        expenseCollapsible.scrollIntoView({ behavior: "smooth", block: "start" });
+        nameInput.focus({ preventScroll: true });
+      } else {
+        // First load: expand and focus after transition
+        const focusTimer = setTimeout(() => {
+          nameInput.focus({ preventScroll: true });
+        }, isReducedMotion ? 0 : 400);
+      }
+    } else {
+      expenseToggle.setAttribute("aria-expanded", "false");
+      expenseCollapsible.setAttribute("inert", "");
+      form.querySelectorAll(".field-error").forEach(el => (el.textContent = ""));
+      submitButton.textContent = "Add Expense";
+      cancelButton.classList.add("hidden");
+
+      if (!editId) {
+        // Only blur first field when closing (not editing)
+        nameInput.blur();
+      }
+    }
+  };
+
+  if (expenseToggle) {
+    expenseToggle.addEventListener("click", toggleAccordion);
+  }
   const bulkActionBar = document.getElementById("bulk-action-bar");
   const selectAllButton = document.getElementById("btn-select-all");
   const cancelSelectButton = document.getElementById("btn-cancel-select");
@@ -672,6 +731,10 @@ function init() {
     form.querySelectorAll(".field-error").forEach(el => (el.textContent = ""));
     submitButton.textContent = "Add Expense";
     cancelButton.classList.add("hidden");
+
+    // Collapse accordion
+    expenseToggle.setAttribute("aria-expanded", "false");
+    expenseCollapsible.setAttribute("inert", "");
   };
 
   const hideToast = () => {
@@ -711,8 +774,12 @@ function init() {
       : "Other";
     submitButton.textContent = "Save changes";
     cancelButton.classList.remove("hidden");
-    form.scrollIntoView({ behavior: "smooth", block: "start" });
-    nameInput.focus();
+
+    // Expand accordion
+    expenseToggle.setAttribute("aria-expanded", "true");
+    expenseCollapsible.removeAttribute("inert");
+    expenseCollapsible.scrollIntoView({ behavior: "smooth", block: "start" });
+    nameInput.focus({ preventScroll: true });
   };
 
   const showBudgetForm = () => {
@@ -933,7 +1000,22 @@ function init() {
     document.body.classList.add("selection-mode");
     expenseList.classList.add("selection-mode");
     if (bulkActionBar) bulkActionBar.classList.remove("hidden");
+
+    // Hide toggle bar entirely in selection mode
+    expenseToggle.classList.add("hidden");
+    expenseCollapsible.classList.add("hidden");
+
     if (selectButton) selectButton.setAttribute("aria-pressed", "true");
+    if (editId) {
+      // Cancel any edit when selection mode starts
+      editId = null;
+      expenseCollapsible.setAttribute("aria-expanded", "false");
+      expenseCollapsible.setAttribute("inert", "");
+      form.reset();
+      cancelButton.classList.add("hidden");
+      submitButton.textContent = "Add Expense";
+      form.querySelectorAll(".field-error").forEach(el => (el.textContent = ""));
+    }
     updateBulkDeleteButton();
   };
 
@@ -942,10 +1024,12 @@ function init() {
     document.body.classList.remove("selection-mode");
     expenseList.classList.remove("selection-mode");
     if (bulkActionBar) bulkActionBar.classList.add("hidden");
+
+    // Restore toggle bar
+    expenseToggle.classList.remove("hidden");
+    expenseCollapsible.classList.remove("hidden");
+
     if (selectButton) selectButton.setAttribute("aria-pressed", "false");
-    expenseList.querySelectorAll(".expense-checkbox").forEach(cb => {
-      cb.checked = false;
-    });
     updateBulkDeleteButton();
   };
 
@@ -1170,8 +1254,20 @@ function init() {
     renderCurrentList(expenses);
     updateCurrentSummary(expenses);
 
+    // Collapse accordion and show toast
+    expenseToggle.setAttribute("aria-expanded", "false");
+    expenseCollapsible.setAttribute("inert", "");
+    if (editId) {
+      showInfoToast("Expense updated");
+    } else {
+      showInfoToast("Expense added");
+    }
+
+    // Reset form state
     resetExpenseForm();
-    nameInput.focus();
+    if (!editId) {
+      nameInput.focus({ preventScroll: true });
+    }
   });
 
   // ── Clear invalid styling as user corrects each field ─────────────────

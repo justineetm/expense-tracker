@@ -81,77 +81,98 @@
       <!-- Add Expense Form -->
       <section class="card form-card">
         <h2 class="section-title">Add Expense</h2>
-        <form id="expense-form" novalidate>
-          <div class="form-group">
-            <label for="item-name">Item Name</label>
-            <input
-              type="text"
-              id="item-name"
-              placeholder="e.g. Coffee, Bus ticket..."
-              maxlength="60"
-              required
-            />
-            <span class="field-error" id="error-name"></span>
-          </div>
 
-          <div class="form-group">
-            <label for="amount">Price each (PHP)</label>
-            <input
-              type="number"
-              id="amount"
-              placeholder="0.00"
-              min="0.01"
-              step="0.01"
-              required
-            />
-            <span class="field-error" id="error-amount"></span>
-          </div>
+        <button
+          type="button"
+          id="expense-toggle"
+          class="expense-toggle"
+          aria-expanded="false"
+          aria-controls="expense-form-collapsible"
+          aria-label="Toggle add expense form"
+        >
+          <span class="toggle-label">+ Add expense</span>
+          <svg class="toggle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
 
-          <div class="form-group">
-            <label for="quantity">Quantity</label>
-            <input
-              type="number"
-              id="quantity"
-              min="1"
-              step="1"
-              value="1"
-              required
-            />
-            <span class="field-error" id="error-quantity"></span>
-          </div>
+        <div
+          id="expense-form-collapsible"
+          class="expense-form-wrapper"
+          inert
+        >
+          <form id="expense-form" novalidate>
+            <div class="form-group">
+              <label for="item-name">Item Name</label>
+              <input
+                type="text"
+                id="item-name"
+                placeholder="e.g. Coffee, Bus ticket..."
+                maxlength="60"
+                required
+              />
+              <span class="field-error" id="error-name"></span>
+            </div>
 
-          <div class="form-group">
-            <label for="expense-date">Date</label>
-            <input
-              type="date"
-              id="expense-date"
-              required
-            />
-            <span class="field-error" id="error-date"></span>
-          </div>
+            <div class="form-group">
+              <label for="amount">Price each (PHP)</label>
+              <input
+                type="number"
+                id="amount"
+                placeholder="0.00"
+                min="0.01"
+                step="0.01"
+                required
+              />
+              <span class="field-error" id="error-amount"></span>
+            </div>
 
-          <div class="form-group">
-            <label for="category">Category</label>
-            <select id="category" required>
-              <option value="" disabled selected>Select a category</option>
-              <option value="Food">&#x1F354; Food</option>
-              <option value="Transport">&#x1F68C; Transport</option>
-              <option value="Load &amp; Data">&#x1F4F1; Load &amp; Data</option>
-              <option value="School">&#x1F393; School</option>
-              <option value="Bills">&#x1F9FE; Bills</option>
-              <option value="Shopping">&#x1F6CD;&#xFE0F; Shopping</option>
-              <option value="Health">&#x1F3E5; Health</option>
-              <option value="Fun">&#x1F389; Fun</option>
-              <option value="Other">&#x1F4E6; Other</option>
-            </select>
-            <span class="field-error" id="error-category"></span>
-          </div>
+            <div class="form-group">
+              <label for="quantity">Quantity</label>
+              <input
+                type="number"
+                id="quantity"
+                min="1"
+                step="1"
+                value="1"
+                required
+              />
+              <span class="field-error" id="error-quantity"></span>
+            </div>
 
-          <div class="form-actions">
-            <button type="submit" class="btn-primary">Add Expense</button>
-            <button type="button" id="btn-cancel" class="btn-cancel hidden">Cancel</button>
-          </div>
-        </form>
+            <div class="form-group">
+              <label for="expense-date">Date</label>
+              <input
+                type="date"
+                id="expense-date"
+                required
+              />
+              <span class="field-error" id="error-date"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="category">Category</label>
+              <select id="category" required>
+                <option value="" disabled selected>Select a category</option>
+                <option value="Food">&#x1F354; Food</option>
+                <option value="Transport">&#x1F68C; Transport</option>
+                <option value="Load &amp; Data">&#x1F4F1; Load &amp; Data</option>
+                <option value="School">&#x1F393; School</option>
+                <option value="Bills">&#x1F9FE; Bills</option>
+                <option value="Shopping">&#x1F6CD;&#xFE0F; Shopping</option>
+                <option value="Health">&#x1F3E5; Health</option>
+                <option value="Fun">&#x1F389; Fun</option>
+                <option value="Other">&#x1F4E6; Other</option>
+              </select>
+              <span class="field-error" id="error-category"></span>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" id="btn-cancel" class="btn-cancel hidden">Cancel</button>
+              <button type="submit" class="btn-primary">Add Expense</button>
+            </div>
+          </form>
+        </div>
       </section>
 
       <!-- Expense List -->
