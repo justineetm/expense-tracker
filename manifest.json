@@ -1,6 +1,6 @@
 {
-  "name": "PeraFlow",
-  "short_name": "PeraFlow",
+  "name": "PeraLog",
+  "short_name": "PeraLog",
   "description": "Track where your money goes",
   "start_url": ".",
   "display": "standalone",

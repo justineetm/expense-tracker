@@ -1,4 +1,4 @@
-﻿b/* =============================================
+/* =============================================
    Reset & Base
    ============================================= */
 *, *::before, *::after {
@@ -8,7 +8,7 @@
 }
 
 :root {
-  --color-bg:         #f4f6f9;
+  --color-bg:         #f3f4f6;
   --color-surface:    #ffffff;
   --color-input:      #ffffff;
   --color-primary:    #4f46e5;
@@ -17,39 +17,40 @@
   --color-focus:      rgba(79, 70, 229, 0.15);
   --color-text:       #1e293b;
   --color-muted:      #64748b;
-  --color-border:     #e2e8f0;
+  --color-border:     #cbd5e1;
   --color-error:      #ef4444;
   --color-badge-bg:   #ede9fe;
   --color-badge-txt:  #6d28d9;
-  --color-summary-start: #4f46e5;
-  --color-summary-end:   #6366f1;
+  --color-charcoal:   #27272a;
+  --color-gold:       #C9A227;
   --color-danger-surface: #fee2e2;
   --color-danger-surface-active: #fecaca;
 
   --radius:    12px;
   --radius-sm: 8px;
-  --shadow:    0 2px 12px rgba(0,0,0,0.08);
+  --shadow:    0 2px 8px rgba(0, 0, 0, 0.06);
   --transition: 0.18s ease;
 }
 
 [data-theme="dark"] {
-  --color-bg:         #0d0d0d;
-  --color-surface:    #242424;
-  --color-input:      #191919;
+  --color-bg:         #090d16;
+  --color-surface:    #161f30;
+  --color-input:      #0f1523;
   --color-primary:    #d4d4d4;
   --color-primary-hv: #f5f5f5;
   --color-primary-text: #121212;
   --color-focus:      rgba(212, 212, 212, 0.2);
-  --color-text:       #f5f5f5;
-  --color-muted:      #bdbdbd;
-  --color-border:     #3d3d3d;
+  --color-text:       #f8fafc;
+  --color-muted:      #94a3b8;
+  --color-border:     #283548;
   --color-error:      #fca5a5;
-  --color-badge-bg:   #2a2a2a;
-  --color-badge-txt:  #e5e5e5;
-  --color-summary-start: #3a3a3a;
-  --color-summary-end:   #4a4a4a;
+  --color-badge-bg:   #222f46;
+  --color-badge-txt:  #cbd5e1;
+  --color-charcoal:   #1e293b;
+  --color-gold:       #C9A227;
   --color-danger-surface: #451a1a;
   --color-danger-surface-active: #7f1d1d;
+  --shadow:           0 2px 10px rgba(0, 0, 0, 0.35);
 }
 
 html {
@@ -75,46 +76,65 @@ body {
    Layout
    ============================================= */
 .container {
-  width: min(100%, 480px);
-  max-width: 100%;
+  width: 100%;
+  max-width: 440px;
   box-sizing: border-box;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0 16px;
 }
 
 /* =============================================
    Header
    ============================================= */
 .app-header {
-  text-align: center;
-  padding: 2rem 0 1.25rem;
-}
-
-.header-row {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
+  justify-content: space-between;
+  padding: 1.5rem 0 1.25rem;
 }
 
-.app-header h1 {
-  font-size: 1.75rem;
+.header-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.header-brand img {
+  width: 32px;
+  height: 32px;
+  display: block;
+}
+
+.header-brand h1 {
+  font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: -0.5px;
+  margin: 0;
+  line-height: 1.2;
 }
 
 .subtitle {
-  margin-top: 0.25rem;
-  font-size: 0.9rem;
+  margin: 0;
+  font-size: 0.875rem;
   color: var(--color-muted);
 }
 
+#theme-toggle,
 .btn-theme {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  min-width: 44px;
+  min-height: 44px;
   padding: 0;
   border: 1.5px solid var(--color-border);
   border-radius: 50%;
@@ -401,7 +421,7 @@ select {
   left: 50%;
   bottom: 1rem;
   width: calc(100% - 2rem);
-  max-width: 448px;
+  max-width: 408px;
   box-sizing: border-box;
   transform: translateX(-50%);
   display: flex;
@@ -553,18 +573,16 @@ select {
   gap: 0.35rem;
   padding: 1.1rem 0.75rem;
   min-width: 0;
-  background: var(--color-primary);
+  background: var(--color-charcoal);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   text-align: center;
-  /* subtle gradient tint */
-  background: linear-gradient(135deg, var(--color-summary-start) 0%, var(--color-summary-end) 100%);
 }
 
 .summary-label {
   font-size: 0.75rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.80);
+  color: #94a3b8;
   letter-spacing: 0.4px;
   text-transform: uppercase;
 }
@@ -572,7 +590,7 @@ select {
 .summary-amount {
   font-size: clamp(1.35rem, 5.5vw, 1.8rem);
   font-weight: 800;
-  color: #ffffff;
+  color: var(--color-gold);
   letter-spacing: -0.5px;
   line-height: 1.1;
 }
