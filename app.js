@@ -286,6 +286,12 @@ function createExpenseItem(expense) {
   const totalAmount = expense.amount * qty;
 
   li.innerHTML = `
+    <input
+      type="checkbox"
+      class="expense-checkbox"
+      data-id="${escapeHTML(expense.id)}"
+      aria-label="Select ${escapeHTML(expense.name)}"
+    />
     <div class="expense-info">
       <span class="expense-name">${escapeHTML(expense.name)}</span>
       <span class="expense-quantity">${qty} × ${CURRENCY}${expense.amount.toFixed(2)}</span>
@@ -373,8 +379,14 @@ function init() {
   const themeToggle = document.getElementById("theme-toggle");
   const submitButton = form.querySelector('button[type="submit"]');
   const cancelButton = document.getElementById("btn-cancel");
+  const selectButton = document.getElementById("btn-select");
+  const bulkActionBar = document.getElementById("bulk-action-bar");
+  const selectAllButton = document.getElementById("btn-select-all");
+  const cancelSelectButton = document.getElementById("btn-cancel-select");
+  const deleteSelectedButton = document.getElementById("btn-delete-selected");
   const toast = document.getElementById("toast");
   const undoButton = document.getElementById("btn-undo");
+  const toastMessage = toast ? toast.querySelector("span") : null;
   const budgetUi = {
     emptyState: document.getElementById("budget-empty-state"),
     formState: document.getElementById("budget-form-state"),
@@ -389,6 +401,7 @@ function init() {
   const budgetEditButton = document.getElementById("budget-edit");
   const budgetSaveButton = document.getElementById("budget-save");
   let editId = null;
+  let isSelectionMode = false;
   let pendingDeletion = null;
   let toastTimer = null;
 
@@ -443,11 +456,12 @@ function init() {
     toastTimer = null;
   };
 
-  const showToast = (expense, index) => {
-    pendingDeletion = { expense, index };
-    toast.classList.remove("hidden");
+  const showToast = (items, message = "Expense deleted.") => {
     if (toastTimer) clearTimeout(toastTimer);
-    toastTimer = setTimeout(hideToast, 5000);
+    pendingDeletion = items;
+    if (toastMessage) toastMessage.textContent = message;
+    toast.classList.remove("hidden");
+    toastTimer = setTimeout(hideToast, 6000);
   };
 
   const startEdit = (expense) => {
@@ -536,8 +550,110 @@ function init() {
     URL.revokeObjectURL(url);
   });
 
+  // ── Selection Mode & Bulk Actions ─────────────────────────────────────
+  const getSelectedCheckboxes = () => {
+    return Array.from(expenseList.querySelectorAll(".expense-checkbox:checked"));
+  };
+
+  const updateBulkDeleteButton = () => {
+    const count = getSelectedCheckboxes().length;
+    if (deleteSelectedButton) {
+      deleteSelectedButton.textContent = `Delete (${count})`;
+      deleteSelectedButton.disabled = count === 0;
+    }
+  };
+
+  const enterSelectionMode = () => {
+    isSelectionMode = true;
+    document.body.classList.add("selection-mode");
+    expenseList.classList.add("selection-mode");
+    if (bulkActionBar) bulkActionBar.classList.remove("hidden");
+    if (selectButton) selectButton.setAttribute("aria-pressed", "true");
+    updateBulkDeleteButton();
+  };
+
+  const exitSelectionMode = () => {
+    isSelectionMode = false;
+    document.body.classList.remove("selection-mode");
+    expenseList.classList.remove("selection-mode");
+    if (bulkActionBar) bulkActionBar.classList.add("hidden");
+    if (selectButton) selectButton.setAttribute("aria-pressed", "false");
+    expenseList.querySelectorAll(".expense-checkbox").forEach(cb => {
+      cb.checked = false;
+    });
+    updateBulkDeleteButton();
+  };
+
+  if (selectButton) {
+    selectButton.addEventListener("click", () => {
+      if (isSelectionMode) {
+        exitSelectionMode();
+      } else {
+        enterSelectionMode();
+      }
+    });
+  }
+
+  if (cancelSelectButton) {
+    cancelSelectButton.addEventListener("click", exitSelectionMode);
+  }
+
+  if (selectAllButton) {
+    selectAllButton.addEventListener("click", () => {
+      const checkboxes = expenseList.querySelectorAll(".expense-checkbox");
+      checkboxes.forEach(cb => {
+        cb.checked = true;
+      });
+      updateBulkDeleteButton();
+    });
+  }
+
+  if (deleteSelectedButton) {
+    deleteSelectedButton.addEventListener("click", () => {
+      const selectedCheckboxes = getSelectedCheckboxes();
+      const count = selectedCheckboxes.length;
+      if (count === 0) return;
+
+      if (!confirm(`Delete ${count} expenses?`)) return;
+
+      const selectedIds = new Set(selectedCheckboxes.map(cb => cb.dataset.id));
+      const expenses = loadExpenses();
+
+      // Compute and store originalIndex based on the item's position in the MAIN expenses array, NOT the displayed list order.
+      // Do this before removing anything.
+      const itemsToDelete = [];
+      expenses.forEach((expense, index) => {
+        if (selectedIds.has(expense.id)) {
+          itemsToDelete.push({ expense, originalIndex: index });
+        }
+      });
+
+      const updatedExpenses = expenses.filter(exp => !selectedIds.has(exp.id));
+      saveExpenses(updatedExpenses);
+      renderCurrentList(updatedExpenses);
+      updateCurrentSummary(updatedExpenses);
+      exitSelectionMode();
+
+      showToast(itemsToDelete, `${count} expenses deleted.`);
+    });
+  }
+
   // ── Delete handler (event delegation on the list) ─────────────────────
   expenseList.addEventListener("click", (e) => {
+    if (isSelectionMode) {
+      const item = e.target.closest(".expense-item");
+      if (!item) return;
+
+      const checkbox = item.querySelector(".expense-checkbox");
+      if (!checkbox) return;
+
+      if (e.target !== checkbox) {
+        checkbox.checked = !checkbox.checked;
+      }
+      updateBulkDeleteButton();
+      return;
+    }
+
     const btn = e.target.closest(".btn-delete");
     if (btn) {
       const expenses = loadExpenses();
@@ -548,7 +664,7 @@ function init() {
       saveExpenses(expenses);
       renderCurrentList(expenses);
       updateCurrentSummary(expenses);
-      showToast(deletedExpense, index);
+      showToast([{ expense: deletedExpense, originalIndex: index }], "Expense deleted.");
       return;
     }
 
@@ -560,11 +676,14 @@ function init() {
   });
 
   undoButton.addEventListener("click", () => {
-    if (!pendingDeletion) return;
+    if (!pendingDeletion || pendingDeletion.length === 0) return;
 
-    const { expense, index } = pendingDeletion;
     const expenses = loadExpenses();
-    expenses.splice(Math.min(index, expenses.length), 0, expense);
+    // Sort the saved array by originalIndex ASCENDING
+    const itemsToRestore = [...pendingDeletion].sort((a, b) => a.originalIndex - b.originalIndex);
+    for (const item of itemsToRestore) {
+      expenses.splice(Math.min(item.originalIndex, expenses.length), 0, item.expense);
+    }
     saveExpenses(expenses);
     renderCurrentList(expenses);
     updateCurrentSummary(expenses);
