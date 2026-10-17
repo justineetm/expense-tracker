@@ -6,16 +6,48 @@
 const STORAGE_KEY = "expense_tracker_v1";
 const THEME_STORAGE_KEY = "expense_tracker_theme";
 const BUDGET_STORAGE_KEY = "expense_budget";
+const CURRENCY_STORAGE_KEY = "peralog_currency";
 
-/** Philippine Peso symbol */
-const CURRENCY = "\u20B1";
+/** Currency code -> human-readable name for the picker dialog. */
+const CURRENCY_LABELS = {
+  PHP: "Philippine Peso",
+  USD: "US Dollar",
+  CAD: "Canadian Dollar",
+  AUD: "Australian Dollar",
+  SGD: "Singapore Dollar",
+  HKD: "Hong Kong Dollar",
+  AED: "UAE Dirham",
+  SAR: "Saudi Riyal",
+  QAR: "Qatari Riyal",
+  JPY: "Japanese Yen",
+  KRW: "South Korean Won",
+  GBP: "British Pound",
+  EUR: "Euro",
+};
+
+/** Currently selected currency code (ISO 4217). Defaults to PHP. */
+let currentCurrencyCode = "PHP";
+
+/** Intl.NumberFormat instance for the current currency. */
+let currencyFormatter = null;
+
+/** Initialize or re-initialize the currency formatter for the given code. */
+function setCurrencyFormatter(code) {
+  currentCurrencyCode = code;
+  currencyFormatter = new Intl.NumberFormat(undefined, {
+    style: "currency",
+    currency: code,
+  });
+}
 
 /** Format a numeric amount for display without changing its stored value. */
 function formatCurrency(amount) {
-  return amount.toLocaleString("en-PH", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
+  return currencyFormatter.format(amount);
+}
+
+/** Return just the currency symbol for the current code (e.g. "₱", "$", "¥"). */
+function getCurrencySymbol() {
+  return currencyFormatter.formatToParts(0).find((p) => p.type === "currency")?.symbol || "";
 }
 
 const CATEGORY_ICONS = {
@@ -151,8 +183,8 @@ function calcSummaryTotals(expenses) {
  */
 function updateSummary(expenses, budgetUi) {
   const { weekTotal, monthTotal } = calcSummaryTotals(expenses);
-  document.getElementById("total-week").textContent  = CURRENCY + formatCurrency(weekTotal);
-  document.getElementById("total-month").textContent = CURRENCY + formatCurrency(monthTotal);
+  document.getElementById("total-week").textContent = formatCurrency(weekTotal);
+  document.getElementById("total-month").textContent = formatCurrency(monthTotal);
 
   if (budgetUi) renderBudget(monthTotal, budgetUi);
 }
@@ -178,8 +210,8 @@ function renderBudget(monthTotal, budgetUi) {
       : "progress-green";
 
   status.textContent = remaining < 0
-    ? `Over budget by ${CURRENCY}${formatCurrency(Math.abs(remaining))}`
-    : `${CURRENCY}${formatCurrency(remaining)} left of ${CURRENCY}${formatCurrency(budget)}`;
+    ? `Over budget by ${formatCurrency(Math.abs(remaining))}`
+    : `${formatCurrency(remaining)} left of ${formatCurrency(budget)}`;
   progressFill.style.width = `${cappedPercentage}%`;
   progressFill.className = `progress-fill ${colorClass}`;
   progressBar.setAttribute("aria-valuenow", String(Math.min(Math.round(percentage), 100)));
@@ -218,7 +250,7 @@ function validateForm(nameInput, amountInput, quantityInput, dateInput, category
   const amt = parseFloat(amountInput.value);
   if (!amountInput.value || isNaN(amt) || amt <= 0) {
     amountInput.classList.add("invalid");
-    errorAmount.textContent = "Please enter an amount greater than \u20B10.";
+    errorAmount.textContent = `Please enter an amount greater than ${getCurrencySymbol()}0.`;
     valid = false;
   }
 
@@ -294,14 +326,14 @@ function createExpenseItem(expense) {
     />
     <div class="expense-info">
       <span class="expense-name">${escapeHTML(expense.name)}</span>
-      <span class="expense-quantity">${qty} × ${CURRENCY}${expense.amount.toFixed(2)}</span>
+      <span class="expense-quantity">${qty} × ${formatCurrency(expense.amount)}</span>
       <div class="expense-meta">
         <span class="expense-date">${formatDate(expense.date)}</span>
         <span class="expense-badge">${icon} ${escapeHTML(displayCategory)}</span>
       </div>
     </div>
     <div class="expense-right">
-      <span class="expense-amount">${CURRENCY}${formatCurrency(totalAmount)}</span>
+      <span class="expense-amount">${formatCurrency(totalAmount)}</span>
       <button
         class="btn-delete"
         aria-label="Delete ${escapeHTML(expense.name)}"
@@ -494,6 +526,8 @@ function init() {
   const infoToastMessage = document.getElementById("info-toast-message");
   const toast = document.getElementById("toast");
   const undoButton = document.getElementById("btn-undo");
+  const currencyButton = document.getElementById("btn-currency");
+  const currencyDialog = document.getElementById("currency-dialog");
   const toastMessage = toast ? toast.querySelector("span") : null;
   const budgetUi = {
     emptyState: document.getElementById("budget-empty-state"),
@@ -542,6 +576,65 @@ function init() {
     applyTheme(nextTheme);
     localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
   });
+
+  // ── Currency ─────────────────────────────────────────────────────────
+  const savedCurrency = localStorage.getItem(CURRENCY_STORAGE_KEY);
+  if (savedCurrency && CURRENCY_LABELS[savedCurrency]) {
+    setCurrencyFormatter(savedCurrency);
+  } else {
+    setCurrencyFormatter("PHP");
+  }
+
+  const updateCurrencyButton = () => {
+    if (currencyButton) {
+      currencyButton.textContent = currentCurrencyCode;
+      currencyButton.setAttribute("aria-label", `Currency: ${currentCurrencyCode} (${CURRENCY_LABELS[currentCurrencyCode]})`);
+      currencyButton.title = `${currentCurrencyCode} - ${CURRENCY_LABELS[currentCurrencyCode]}`;
+    }
+  };
+  updateCurrencyButton();
+
+  if (currencyButton && currencyDialog) {
+    currencyButton.addEventListener("click", () => {
+      currencyDialog.showModal();
+    });
+
+    currencyDialog.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-currency]");
+      if (!btn) return;
+      const code = btn.dataset.currency;
+      if (CURRENCY_LABELS[code]) {
+        setCurrencyFormatter(code);
+        localStorage.setItem(CURRENCY_STORAGE_KEY, code);
+        updateCurrencyButton();
+        currencyDialog.close();
+        // Re-render everything with the new currency
+        const expenses = loadExpenses();
+        renderCurrentList(expenses);
+        updateCurrentSummary(expenses);
+        // Update HTML labels that reference currency
+        updateCurrencyLabels();
+      }
+    });
+
+    // Close dialog when clicking backdrop
+    currencyDialog.addEventListener("click", (e) => {
+      if (e.target === currencyDialog) currencyDialog.close();
+    });
+  }
+
+  // Update HTML labels that show the currency symbol/code
+  function updateCurrencyLabels() {
+    const symbol = getCurrencySymbol();
+    const amountLabel = document.querySelector('label[for="amount"]');
+    if (amountLabel) {
+      amountLabel.textContent = `Price each (${currentCurrencyCode})`;
+    }
+    const budgetLabel = document.querySelector('label[for="budget-input"]');
+    if (budgetLabel) {
+      budgetLabel.textContent = `Monthly budget (${currentCurrencyCode})`;
+    }
+  }
 
   const renderCurrentList = (expenses) => {
     renderList(expenses, expenseList, emptyState, filterSel.value);
@@ -1075,6 +1168,12 @@ function init() {
   const saved = loadExpenses();
   renderCurrentList(saved);
   updateCurrentSummary(saved);
+
+  // Auto-open currency picker on first launch (no saved currency and no expenses)
+  const savedCurrencyForAuto = localStorage.getItem(CURRENCY_STORAGE_KEY);
+  if (!savedCurrencyForAuto && saved.length === 0 && currencyDialog) {
+    currencyDialog.showModal();
+  }
 
   // Prevent scroll wheel from changing number inputs
   document.addEventListener("wheel", (e) => {

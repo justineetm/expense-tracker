@@ -1,4 +1,4 @@
-const CACHE_NAME = 'peralog-v6';
+const CACHE_NAME = 'peralog-v8';
 const ASSETS = [
   './',
   './index.html',

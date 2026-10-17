@@ -520,6 +520,46 @@ select {
 }
 
 /* =============================================
+   Currency Dialog & Picker
+   ============================================= */
+.currency-disclaimer {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+.currency-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.currency-grid button {
+  min-height: 44px;
+  padding: 0.5rem 0.75rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.currency-grid button:hover {
+  background: var(--color-badge-bg);
+  border-color: var(--color-primary);
+}
+
+.currency-grid button:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* =============================================
    Bulk Action Bar & Selection Mode
    ============================================= */
 .bulk-action-bar {
@@ -839,16 +879,16 @@ body.selection-mode #info-toast {
    ============================================= */
 
 /*
- * .list-header: row that holds the "Spending List" title and
- * the filter bar side-by-side, aligning to opposite ends.
+ * .list-header: Row 1 - "Spending List" title on the left,
+ * Import/Export icon buttons on the right.
  */
 .list-header {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  margin-bottom: 1.1rem;
-  flex-wrap: wrap;      /* wraps on very narrow screens */
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
 }
 
 /* The section-title inside list-header loses its bottom-margin
@@ -859,19 +899,40 @@ body.selection-mode #info-toast {
   min-width: 140px;
 }
 
-.list-controls {
+/* Row 1 action group: Import/Export icon buttons side-by-side. */
+.list-actions {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: 0.5rem;
   flex-shrink: 0;
 }
 
-.filter-bar {
+/*
+ * .list-controls: Row 2 - Category filter dropdown stretches to fill
+ * available width, followed by the "Select" text button.
+ */
+.list-controls {
   display: flex;
-  width: auto;
-  align-items: flex-start;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.list-controls .filter-bar {
+  display: flex;
   flex-direction: column;
   gap: 0.4rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.list-controls .filter-select {
+  flex: 1;
+  min-width: 0;
+  max-width: none;
+}
+
+.list-controls .btn-secondary {
   flex-shrink: 0;
 }
 
@@ -922,19 +983,40 @@ body.selection-mode #info-toast {
   }
 
   .list-header {
-    align-items: flex-end;
+    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .list-header .section-title {
+    flex: none;
+    min-width: auto;
+  }
+
+  .list-actions {
+    flex-shrink: 0;
   }
 
   .list-controls {
     width: 100%;
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .filter-bar {
+  .list-controls .filter-bar {
     flex: 1;
+    min-width: 0;
   }
 
-  .filter-select {
+  .list-controls .filter-select {
     flex: 1;
+    max-width: none;
+    min-width: 0;
+  }
+
+  .list-controls .btn-secondary {
+    width: 100%;
     max-width: none;
   }
 }

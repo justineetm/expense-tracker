@@ -1,4 +1,4 @@
-
+﻿
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -29,17 +29,24 @@
           aria-pressed="false"
           title="Switch to dark mode"
         >&#x1F319;</button>
+        <button
+          type="button"
+          id="btn-currency"
+          class="btn-theme"
+          aria-label="Currency: PHP (Philippine Peso)"
+          title="PHP - Philippine Peso"
+        >PHP</button>
       </header>
 
       <!-- Summary Cards -->
       <section class="summary-grid" aria-label="Spending summary">
         <div class="summary-card" id="summary-week">
           <span class="summary-label">&#x1F4C5; This Week</span>
-          <span class="summary-amount" id="total-week">&#x20B1;0.00</span>
+          <span class="summary-amount" id="total-week"></span>
         </div>
         <div class="summary-card" id="summary-month">
           <span class="summary-label">&#x1F4C6; This Month</span>
-          <span class="summary-amount" id="total-month">&#x20B1;0.00</span>
+          <span class="summary-amount" id="total-month"></span>
         </div>
       </section>
 
@@ -52,7 +59,7 @@
         </div>
 
         <div id="budget-form-state" class="budget-state hidden">
-          <label for="budget-input">Monthly budget (&#x20B1;)</label>
+          <label for="budget-input">Monthly budget (PHP)</label>
           <div class="budget-input-row">
             <input type="number" id="budget-input" min="0.01" step="0.01" placeholder="0.00" inputmode="decimal" />
             <button type="button" id="budget-save" class="btn-budget btn-budget-primary">Save</button>
@@ -88,7 +95,7 @@
           </div>
 
           <div class="form-group">
-            <label for="amount">Price each (&#x20B1;)</label>
+            <label for="amount">Price each (PHP)</label>
             <input
               type="number"
               id="amount"
@@ -151,46 +158,63 @@
       <section class="card list-card">
         <div class="list-header">
           <h2 class="section-title">Spending List</h2>
-          <!-- Controls area -->
-          <div class="list-controls">
-            <div class="filter-bar">
-              <label for="filter-category" class="filter-label">Filter</label>
-              <select id="filter-category" class="filter-select">
-                <option value="">All Categories</option>
-                <option value="Food">&#x1F354; Food</option>
-                <option value="Transport">&#x1F68C; Transport</option>
-                <option value="Load &amp; Data">&#x1F4F1; Load &amp; Data</option>
-                <option value="School">&#x1F393; School</option>
-                <option value="Bills">&#x1F9FE; Bills</option>
-                <option value="Shopping">&#x1F6CD;&#xFE0F; Shopping</option>
-                <option value="Health">&#x1F3E5; Health</option>
-                <option value="Fun">&#x1F389; Fun</option>
-                <option value="Other">&#x1F4E6; Other</option>
-              </select>
-            </div>
+          <div class="list-actions">
             <button
               type="button"
-              id="btn-select"
-              class="btn-secondary"
-              title="Select expenses"
-              aria-label="Select expenses"
-            >Select</button>
+              id="btn-import"
+              class="btn-secondary btn-icon"
+              title="Import CSV"
+              aria-label="Import CSV"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <!-- The downward arrow -->
+  <path d="M12 3v13" />
+  <path d="M8 12l4 4 4-4" />
+  <!-- The unbroken bottom curve -->
+  <path d="M5 15a7 7 0 0 0 14 0" />
+</svg>
+            </button>
             <button
               type="button"
               id="btn-export"
               class="btn-secondary btn-icon"
               title="Export CSV"
               aria-label="Export CSV"
-            >&#x1F4E5;</button>
-            <button
-              type="button"
-              id="btn-import"
-              class="btn-secondary"
-              title="Import CSV"
-              aria-label="Import CSV"
-            >Import</button>
-            <input type="file" id="file-import" class="hidden" accept=".csv" />
+            >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <!-- The upward arrow -->
+  <path d="M12 16V3" />
+  <path d="M8 7l4-4 4 4" />
+  <!-- The perfectly matching bottom curve -->
+  <path d="M5 15a7 7 0 0 0 14 0" />
+</svg>
+            </button>
           </div>
+        </div>
+        <div class="list-controls">
+          <div class="filter-bar">
+            <label for="filter-category" class="filter-label">Filter</label>
+            <select id="filter-category" class="filter-select">
+              <option value="">All Categories</option>
+              <option value="Food">&#x1F354; Food</option>
+              <option value="Transport">&#x1F68C; Transport</option>
+              <option value="Load &amp; Data">&#x1F4F1; Load &amp; Data</option>
+              <option value="School">&#x1F393; School</option>
+              <option value="Bills">&#x1F9FE; Bills</option>
+              <option value="Shopping">&#x1F6CD;&#xFE0F; Shopping</option>
+              <option value="Health">&#x1F3E5; Health</option>
+              <option value="Fun">&#x1F389; Fun</option>
+              <option value="Other">&#x1F4E6; Other</option>
+            </select>
+          </div>
+          <button
+            type="button"
+            id="btn-select"
+            class="btn-secondary"
+            title="Select expenses"
+            aria-label="Select expenses"
+          >Select</button>
+          <input type="file" id="file-import" class="hidden" accept=".csv" />
         </div>
         <ul id="expense-list" class="expense-list"></ul>
         <p id="empty-state" class="empty-state">No expenses yet. Add one above!</p>
@@ -218,6 +242,28 @@
         <div class="dialog-actions">
           <button type="button" id="btn-dialog-cancel" class="btn-bulk btn-bulk-secondary">Cancel</button>
           <button type="button" id="btn-dialog-confirm" class="btn-bulk btn-bulk-danger">Delete</button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="currency-dialog" class="confirm-dialog" aria-labelledby="currency-dialog-title">
+      <div class="dialog-content">
+        <p id="currency-dialog-title" class="dialog-title">Choose Currency</p>
+        <p class="currency-disclaimer">This only changes the symbol. Your numbers are not converted.</p>
+        <div class="currency-grid" role="radiogroup" aria-label="Select currency">
+          <button type="button" data-currency="PHP">PHP &#8211; Philippine Peso</button>
+          <button type="button" data-currency="USD">USD &#8211; US Dollar</button>
+          <button type="button" data-currency="CAD">CAD &#8211; Canadian Dollar</button>
+          <button type="button" data-currency="AUD">AUD &#8211; Australian Dollar</button>
+          <button type="button" data-currency="SGD">SGD &#8211; Singapore Dollar</button>
+          <button type="button" data-currency="HKD">HKD &#8211; Hong Kong Dollar</button>
+          <button type="button" data-currency="AED">AED &#8211; UAE Dirham</button>
+          <button type="button" data-currency="SAR">SAR &#8211; Saudi Riyal</button>
+          <button type="button" data-currency="QAR">QAR &#8211; Qatari Riyal</button>
+          <button type="button" data-currency="JPY">JPY &#8211; Japanese Yen</button>
+          <button type="button" data-currency="KRW">KRW &#8211; South Korean Won</button>
+          <button type="button" data-currency="GBP">GBP &#8211; British Pound</button>
+          <button type="button" data-currency="EUR">EUR &#8211; Euro</button>
         </div>
       </div>
     </dialog>
