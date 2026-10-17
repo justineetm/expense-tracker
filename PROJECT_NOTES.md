@@ -25,6 +25,9 @@ PeraLog is a mobile-first, offline-capable expense tracker.
 - **Sorting:** The expense list is actively sorted chronologically (newest date first) comparing `YYYY-MM-DD`. If dates match exactly, it sorts by array index (newest added first).
 - **Dates:** Legacy expenses use ISO strings; new expenses use `YYYY-MM-DD`. Logic must handle both without crashing.
 - **Undo Deletion:** Single and multi-item deleted expenses are held in memory for 6 seconds via a toast notification. Undoing restores items to their **exact original array indices** by sorting the deleted items ascending by `originalIndex` and splicing them back into the main array (`array.splice(item.originalIndex, 0, item.expense)`).
+- **Long-Press Selection:** Long-pressing (500ms) an `.expense-item` activates selection mode with that item checked. Uses pointer events (`pointerdown`, `pointermove`, `pointerup`, `pointercancel`), cancels on pointer movement, ignores presses on nested buttons/checkboxes, prevents contextmenu, and suppresses subsequent click. `touch-action: none` is prohibited on rows to preserve native vertical scroll.
+- **Bulk Delete Confirmation (<5 vs >=5):** Bulk deleting < 5 expenses bypasses confirmation dialogs entirely and deletes immediately with a 6-second Undo toast. Deleting >= 5 expenses displays a custom modal `<dialog id="confirm-dialog">` with Cancel focused by default.
+- **Alerts & Modals:** Native `alert()` and `confirm()` are strictly forbidden. Alerts are replaced by an independent `#info-toast` (3s auto-hide) that does not interfere with the Undo toast. Confirmations use native `<dialog>`.
 
 ## Features Already Built (do not break)
 
@@ -32,8 +35,9 @@ Add expense: item, price each, quantity, date, category
 Categories: Food, Transport, Load & Data, School, Bills, Shopping, Health, Fun, Other
 Weekly and monthly totals, monthly budget with progress bar
 Edit by tapping a row, delete with Undo
-Bulk delete with multi-item selection and Undo
+Bulk delete with multi-item selection, long-press activation, and Undo
 Category filter, CSV export (all expenses, ignores filter)
+No native alert/confirm dialogs (custom dialog + info toast)
 Light/dark toggle, installable PWA
 
 

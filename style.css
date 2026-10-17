@@ -415,6 +415,30 @@ select {
   display: none !important;
 }
 
+#info-toast {
+  position: fixed;
+  z-index: 30;
+  left: 50%;
+  bottom: 4.75rem;
+  width: calc(100% - 2rem);
+  max-width: 408px;
+  box-sizing: border-box;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.875rem 1rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow);
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: bottom var(--transition);
+}
+
 #toast {
   position: fixed;
   z-index: 30;
@@ -447,6 +471,52 @@ select {
   font: inherit;
   font-weight: 700;
   cursor: pointer;
+}
+
+/* =============================================
+   Confirm Dialog
+   ============================================= */
+.confirm-dialog {
+  width: calc(100% - 2rem);
+  max-width: 380px;
+  box-sizing: border-box;
+  margin: auto;
+  padding: 1.5rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow);
+}
+
+.confirm-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.dialog-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--color-text);
+}
+
+.dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.dialog-actions button {
+  min-height: 44px;
+  min-width: 80px;
 }
 
 /* =============================================
@@ -525,6 +595,10 @@ body.selection-mode #toast {
   bottom: 5.5rem;
 }
 
+body.selection-mode #info-toast {
+  bottom: 9.5rem;
+}
+
 .expense-checkbox {
   display: none;
   width: 22px;
@@ -576,6 +650,9 @@ body.selection-mode #toast {
   border-radius: var(--radius-sm);
   background: var(--color-bg);
   animation: slide-in 0.22s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 @keyframes slide-in {

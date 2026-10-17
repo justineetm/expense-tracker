@@ -171,10 +171,10 @@
             <button
               type="button"
               id="btn-select"
-              class="btn-secondary btn-icon"
+              class="btn-secondary"
               title="Select expenses"
               aria-label="Select expenses"
-            >&#x2611;&#xFE0F;</button>
+            >Select</button>
             <button
               type="button"
               id="btn-export"
@@ -195,10 +195,24 @@
       <button type="button" id="btn-delete-selected" class="btn-bulk btn-bulk-danger" disabled>Delete (0)</button>
     </div>
 
+    <div id="info-toast" class="hidden" role="status" aria-live="polite">
+      <span id="info-toast-message"></span>
+    </div>
+
     <div id="toast" class="hidden" role="status" aria-live="polite">
       <span>Expense deleted.</span>
       <button type="button" id="btn-undo">Undo</button>
     </div>
+
+    <dialog id="confirm-dialog" class="confirm-dialog" aria-labelledby="confirm-dialog-title">
+      <div class="dialog-content">
+        <p id="confirm-dialog-title" class="dialog-title">Delete 5 expenses?</p>
+        <div class="dialog-actions">
+          <button type="button" id="btn-dialog-cancel" class="btn-bulk btn-bulk-secondary">Cancel</button>
+          <button type="button" id="btn-dialog-confirm" class="btn-bulk btn-bulk-danger">Delete</button>
+        </div>
+      </div>
+    </dialog>
 
     <script src="app.js"></script>
     <script>

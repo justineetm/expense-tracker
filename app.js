@@ -384,6 +384,12 @@ function init() {
   const selectAllButton = document.getElementById("btn-select-all");
   const cancelSelectButton = document.getElementById("btn-cancel-select");
   const deleteSelectedButton = document.getElementById("btn-delete-selected");
+  const confirmDialog = document.getElementById("confirm-dialog");
+  const confirmDialogTitle = document.getElementById("confirm-dialog-title");
+  const dialogCancelButton = document.getElementById("btn-dialog-cancel");
+  const dialogConfirmButton = document.getElementById("btn-dialog-confirm");
+  const infoToast = document.getElementById("info-toast");
+  const infoToastMessage = document.getElementById("info-toast-message");
   const toast = document.getElementById("toast");
   const undoButton = document.getElementById("btn-undo");
   const toastMessage = toast ? toast.querySelector("span") : null;
@@ -404,6 +410,12 @@ function init() {
   let isSelectionMode = false;
   let pendingDeletion = null;
   let toastTimer = null;
+  let infoToastTimer = null;
+  let longPressTimer = null;
+  let longPressTarget = null;
+  let startX = 0;
+  let startY = 0;
+  let suppressClick = false;
 
   const applyTheme = (theme) => {
     const isDark = theme === "dark";
@@ -464,6 +476,16 @@ function init() {
     toastTimer = setTimeout(hideToast, 6000);
   };
 
+  const showInfoToast = (msg) => {
+    if (infoToastTimer) clearTimeout(infoToastTimer);
+    if (infoToastMessage) infoToastMessage.textContent = msg;
+    if (infoToast) infoToast.classList.remove("hidden");
+    infoToastTimer = setTimeout(() => {
+      if (infoToast) infoToast.classList.add("hidden");
+      infoToastTimer = null;
+    }, 3000);
+  };
+
   const startEdit = (expense) => {
     editId = expense.id;
     nameInput.value = expense.name;
@@ -517,7 +539,7 @@ function init() {
   exportButton.addEventListener("click", () => {
     const expenses = loadExpenses();
     if (expenses.length === 0) {
-      alert("No expenses to export yet!");
+      showInfoToast("No expenses to export yet!");
       return;
     }
 
@@ -608,38 +630,122 @@ function init() {
     });
   }
 
+  const executeBulkDelete = (selectedCheckboxes) => {
+    const count = selectedCheckboxes.length;
+    if (count === 0) return;
+
+    const selectedIds = new Set(selectedCheckboxes.map(cb => cb.dataset.id));
+    const expenses = loadExpenses();
+
+    // Compute and store originalIndex based on the item's position in the MAIN expenses array, NOT the displayed list order.
+    // Do this before removing anything.
+    const itemsToDelete = [];
+    expenses.forEach((expense, index) => {
+      if (selectedIds.has(expense.id)) {
+        itemsToDelete.push({ expense, originalIndex: index });
+      }
+    });
+
+    const updatedExpenses = expenses.filter(exp => !selectedIds.has(exp.id));
+    saveExpenses(updatedExpenses);
+    renderCurrentList(updatedExpenses);
+    updateCurrentSummary(updatedExpenses);
+    exitSelectionMode();
+
+    showToast(itemsToDelete, `${count} expenses deleted.`);
+  };
+
   if (deleteSelectedButton) {
     deleteSelectedButton.addEventListener("click", () => {
       const selectedCheckboxes = getSelectedCheckboxes();
       const count = selectedCheckboxes.length;
       if (count === 0) return;
 
-      if (!confirm(`Delete ${count} expenses?`)) return;
-
-      const selectedIds = new Set(selectedCheckboxes.map(cb => cb.dataset.id));
-      const expenses = loadExpenses();
-
-      // Compute and store originalIndex based on the item's position in the MAIN expenses array, NOT the displayed list order.
-      // Do this before removing anything.
-      const itemsToDelete = [];
-      expenses.forEach((expense, index) => {
-        if (selectedIds.has(expense.id)) {
-          itemsToDelete.push({ expense, originalIndex: index });
+      if (count < 5) {
+        executeBulkDelete(selectedCheckboxes);
+      } else {
+        if (confirmDialog && confirmDialogTitle) {
+          confirmDialogTitle.textContent = `Delete ${count} expenses?`;
+          confirmDialog.showModal();
+          if (dialogCancelButton) dialogCancelButton.focus();
         }
-      });
-
-      const updatedExpenses = expenses.filter(exp => !selectedIds.has(exp.id));
-      saveExpenses(updatedExpenses);
-      renderCurrentList(updatedExpenses);
-      updateCurrentSummary(updatedExpenses);
-      exitSelectionMode();
-
-      showToast(itemsToDelete, `${count} expenses deleted.`);
+      }
     });
   }
 
+  if (dialogCancelButton) {
+    dialogCancelButton.addEventListener("click", () => {
+      if (confirmDialog) confirmDialog.close();
+    });
+  }
+
+  if (dialogConfirmButton) {
+    dialogConfirmButton.addEventListener("click", () => {
+      if (confirmDialog) confirmDialog.close();
+      executeBulkDelete(getSelectedCheckboxes());
+    });
+  }
+
+  // ── Long-Press Selection Logic (Pointer Events) ───────────────────────
+  const cancelLongPress = () => {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      longPressTimer = null;
+    }
+    longPressTarget = null;
+  };
+
+  expenseList.addEventListener("pointerdown", (e) => {
+    if (isSelectionMode) return;
+    if (e.target.closest("button, input[type='checkbox']")) return;
+
+    const item = e.target.closest(".expense-item");
+    if (!item) return;
+
+    cancelLongPress();
+    longPressTarget = item;
+    startX = e.clientX;
+    startY = e.clientY;
+
+    longPressTimer = setTimeout(() => {
+      if (longPressTarget) {
+        suppressClick = true;
+        setTimeout(() => { suppressClick = false; }, 400);
+        enterSelectionMode();
+        const checkbox = longPressTarget.querySelector(".expense-checkbox");
+        if (checkbox) {
+          checkbox.checked = true;
+          updateBulkDeleteButton();
+        }
+      }
+      cancelLongPress();
+    }, 500);
+  });
+
+  expenseList.addEventListener("pointermove", (e) => {
+    if (!longPressTimer) return;
+    const dist = Math.hypot(e.clientX - startX, e.clientY - startY);
+    if (dist > 10) {
+      cancelLongPress();
+    }
+  });
+
+  expenseList.addEventListener("pointerup", cancelLongPress);
+  expenseList.addEventListener("pointercancel", cancelLongPress);
+
+  expenseList.addEventListener("contextmenu", (e) => {
+    if (e.target.closest(".expense-item")) {
+      e.preventDefault();
+    }
+  });
+
   // ── Delete handler (event delegation on the list) ─────────────────────
   expenseList.addEventListener("click", (e) => {
+    if (suppressClick) {
+      suppressClick = false;
+      return;
+    }
+
     if (isSelectionMode) {
       const item = e.target.closest(".expense-item");
       if (!item) return;
@@ -742,6 +848,13 @@ function init() {
   document.addEventListener("wheel", (e) => {
     if (document.activeElement.type === "number") {
       document.activeElement.blur();
+    }
+  });
+
+  // Escape key exits selection mode
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && isSelectionMode) {
+      exitSelectionMode();
     }
   });
 }
