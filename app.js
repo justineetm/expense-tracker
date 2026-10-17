@@ -25,6 +25,23 @@ const CURRENCY_LABELS = {
   EUR: "Euro",
 };
 
+/** Currency code -> emoji flag for the UI picker and header button. */
+const CURRENCY_FLAGS = {
+  PHP: "\u{1F1F5}\u{1F1ED}", // 🇵🇭
+  USD: "\u{1F1FA}\u{1F1F8}", // 🇺🇸
+  CAD: "\u{1F1E0}\u{1F1E9}", // 🇨🇦
+  AUD: "\u{1F1E6}\u{1F1FA}", // 🇦🇺
+  SGD: "\u{1F1F8}\u{1F1E4}", // 🇸🇬
+  HKD: "\u{1F1ED}\u{1F1F0}", // 🇭🇰
+  AED: "\u{1F1E6}\u{1F1EA}", // 🇦🇪
+  SAR: "\u{1F1F8}\u{1F1E6}", // 🇸🇦
+  QAR: "\u{1F1F6}\u{1F1E4}", // 🇶🇦
+  JPY: "\u{1F1EF}\u{1F1F5}", // 🇯🇵
+  KRW: "\u{1F1F0}\u{1F1F7}", // 🇰🇷
+  GBP: "\u{1F1EC}\u{1F1E7}", // 🇬🇧
+  EUR: "\u{1F1EA}\u{1F1FA}", // 🇪🇺
+};
+
 /** Currently selected currency code (ISO 4217). Defaults to PHP. */
 let currentCurrencyCode = "PHP";
 
@@ -587,7 +604,8 @@ function init() {
 
   const updateCurrencyButton = () => {
     if (currencyButton) {
-      currencyButton.textContent = currentCurrencyCode;
+      const flag = CURRENCY_FLAGS[currentCurrencyCode] || "";
+      currencyButton.textContent = `${flag} ${currentCurrencyCode}`;
       currencyButton.setAttribute("aria-label", `Currency: ${currentCurrencyCode} (${CURRENCY_LABELS[currentCurrencyCode]})`);
       currencyButton.title = `${currentCurrencyCode} - ${CURRENCY_LABELS[currentCurrencyCode]}`;
     }
@@ -712,7 +730,7 @@ function init() {
     const budget = parseFloat(budgetUi.input.value);
 
     if (!Number.isFinite(budget) || budget <= 0) {
-      budgetUi.error.textContent = "Please enter a monthly budget greater than \u20B10.";
+      budgetUi.error.textContent = `Please enter a monthly budget greater than ${getCurrencySymbol()}0.`;
       budgetUi.input.classList.add("invalid");
       return;
     }

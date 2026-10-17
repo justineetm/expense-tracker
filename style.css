@@ -160,6 +160,40 @@ body {
   outline-offset: 2px;
 }
 
+/* Currency button: pill-shaped, not a squished circle. */
+.btn-currency {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.45rem 0.85rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: 999px; /* pill */
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition), transform var(--transition);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-currency:hover {
+  border-color: var(--color-primary);
+  background: var(--color-badge-bg);
+}
+
+.btn-currency:active {
+  transform: scale(0.95);
+}
+
+.btn-currency:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
 /* =============================================
    Cards
    ============================================= */
