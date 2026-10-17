@@ -8,7 +8,7 @@ PeraLog is a mobile-first, offline-capable expense tracker.
 - **No Libraries:** Strictly no external libraries or frameworks (no React, Tailwind, Moment.js, etc.).
 - **Storage:** Data is persisted exclusively via `localStorage`.
 - **Hosting:** Hosted on GitHub Pages in a subfolder. **ALL paths must be relative** (e.g., `./img/icon.png`, `./sw.js`).
-- **PWA:** Fully offline capable using a service worker with versioned caching.
+- **PWA:** Fully offline capable using a service worker with versioned caching. Cache version: `peralog-v6`.
 
 ## Design System & UI Rules
 - **Layout:** Strictly mobile-first. Container must be `max-width: 440px` with `16px` side padding. No horizontal scrolling or overflow.
@@ -45,6 +45,42 @@ Light/dark toggle, installable PWA
 
 Old expenses may have no quantity: treat as 1
 Old expenses with removed categories: show as "Other"
+
+## CSV Import (manual parsing, no libraries)
+
+**Export column order (must match exactly):** `Date,Item,Category,Price Each,Quantity,Total`
+
+**Parsing rules:**
+- UTF-8 BOM (`\uFEFF`) stripped from start of file
+- Commas inside quoted fields are handled (e.g. `"12"" pizza"`)
+- Doubled quotes (`""`) inside quoted fields unescape to a single `"`
+- Both `\r\n` (Excel) and `\n` line endings supported; blank lines ignored
+- Entire parse is wrapped in `try/catch`; on failure `#info-toast` shows and data is untouched
+
+**Header validation:**
+- Header row trimmed and BOM removed before comparison
+- Must exactly match `Date,Item,Category,Price Each,Quantity,Total`
+- Mismatch shows `#info-toast`: "This doesn't look like a PeraLog file." and aborts
+
+**Row processing:**
+- Columns map to: `date`, `name`, `category`, `amount`, `quantity` (Total column ignored)
+- Rows with missing names, invalid amounts (not a number > 0), or invalid dates are skipped
+- Strict date validation: `YYYY-MM-DD` format only; round-trip check rejects overflow dates like `2026-02-31`
+- Missing/invalid quantity defaults to 1
+- Category matched against known categories with or without emoji prefix; unmatched defaults to "Other"
+- Every valid imported row gets a new `crypto.randomUUID()`
+
+**Deduplication:**
+- Frequency map built from EXISTING expenses only (never from imported rows)
+- Key format: `date.substring(0,10) + "|" + name (trimmed, lowercase) + "|" + Number(amount).toFixed(2) + "|" + (quantity || 1)`
+- The `|` character is the key separator
+- If map count > 0 for an imported row's key: skip row, decrement map count by 1
+- Otherwise: import row; imported rows are never compared against each other or against rows added during this import
+
+**Save & notification:**
+- Merged array saved exclusively via `saveExpenses()` (never direct localStorage writes)
+- Re-renders list, updates summaries/budget, resets file input value
+- `#info-toast` shows "Imported N, skipped M" (independent of Undo toast)
 
 
 ## Agent Workflow Rules

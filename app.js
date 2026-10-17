@@ -356,6 +356,108 @@ function renderList(expenses, listEl, emptyEl, categoryFilter = "") {
 }
 
 /* =============================================
+   CSV Import Helpers (vanilla JS, no libraries)
+   ============================================= */
+
+/**
+ * Parses a CSV string into an array of rows (each row is an array of fields).
+ * Handles: UTF-8 BOM (removed by caller), quoted fields with embedded commas,
+ * doubled quotes for escaping, \r\n and \n line endings, and blank lines (skipped).
+ * @param {string} text
+ * @returns {string[][]}
+ */
+function parseCSV(text) {
+  const rows = [];
+  let row = [];
+  let field = "";
+  let inQuotes = false;
+  let i = 0;
+  const len = text.length;
+
+  while (i < len) {
+    const ch = text[i];
+
+    if (inQuotes) {
+      if (ch === '"') {
+        if (i + 1 < len && text[i + 1] === '"') {
+          field += '"';
+          i += 2;
+        } else {
+          inQuotes = false;
+          i++;
+        }
+      } else {
+        field += ch;
+        i++;
+      }
+    } else {
+      if (ch === '"') {
+        inQuotes = true;
+        i++;
+      } else if (ch === ",") {
+        row.push(field);
+        field = "";
+        i++;
+      } else if (ch === "\r") {
+        row.push(field);
+        field = "";
+        if (i + 1 < len && text[i + 1] === "\n") i++;
+        if (row.some((f) => f !== "")) rows.push(row);
+        row = [];
+        i++;
+      } else if (ch === "\n") {
+        row.push(field);
+        field = "";
+        if (row.some((f) => f !== "")) rows.push(row);
+        row = [];
+        i++;
+      } else {
+        field += ch;
+        i++;
+      }
+    }
+  }
+
+  if (field !== "" || row.length > 0) {
+    row.push(field);
+    if (row.some((f) => f !== "")) rows.push(row);
+  }
+
+  return rows;
+}
+
+/**
+ * Strict YYYY-MM-DD validation.
+ * Rejects overflow dates like 2026-02-31 by verifying round-trip components.
+ * @param {string} dateStr
+ * @returns {boolean}
+ */
+function isValidISODate(dateStr) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateStr);
+  if (!match) return false;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  if (month < 1 || month > 12 || day < 1 || day > 31) return false;
+  const d = new Date(year, month - 1, day);
+  return d.getFullYear() === year && d.getMonth() === month - 1 && d.getDate() === day;
+}
+
+/**
+ * Match a raw category string (with or without emoji) to a known category.
+ * Defaults to "Other" when no match is found.
+ * @param {string} raw
+ * @returns {string}
+ */
+function resolveCategory(raw) {
+  const trimmed = raw.trim();
+  if (Object.hasOwn(CATEGORY_ICONS, trimmed)) return trimmed;
+  const stripped = trimmed.replace(/[\u{1F300}-\u{1F9FF}]/gu, "").trim();
+  if (Object.hasOwn(CATEGORY_ICONS, stripped)) return stripped;
+  return "Other";
+}
+
+/* =============================================
    Initialisation  (no global mutable state)
    ============================================= */
 
@@ -570,6 +672,136 @@ function init() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+  });
+
+  // ========== CSV Import ==========
+  const importButton = document.getElementById("btn-import");
+  const fileInput = document.getElementById("file-import");
+
+  importButton.addEventListener("click", () => {
+    fileInput.click();
+  });
+
+  fileInput.addEventListener("change", () => {
+    const file = fileInput.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        let text = e.target.result;
+
+        // Strip UTF-8 BOM if present
+        if (text.charCodeAt(0) === 0xFEFF) {
+          text = text.slice(1);
+        }
+
+        const rows = parseCSV(text);
+        if (rows.length === 0) throw new Error("Empty CSV");
+
+        // Validate header row against expected export columns
+        const EXPECTED = ["Date", "Item", "Category", "Price Each", "Quantity", "Total"];
+        const headers = rows[0].map((h) => h.trim());
+        if (headers.join(",") !== EXPECTED.join(",")) {
+          showInfoToast("This doesn't look like a PeraLog file.");
+          fileInput.value = "";
+          return;
+        }
+
+        // Build frequency map of EXISTING expenses for dedup
+        const existing = loadExpenses();
+        const freqMap = new Map();
+        for (const exp of existing) {
+          const key =
+            exp.date.substring(0, 10) +
+            "|" +
+            exp.name.trim().toLowerCase() +
+            "|" +
+            Number(exp.amount).toFixed(2) +
+            "|" +
+            (exp.quantity || 1);
+          freqMap.set(key, (freqMap.get(key) || 0) + 1);
+        }
+
+        let imported = 0;
+        let skipped = 0;
+        const newExpenses = [];
+
+        for (let r = 1; r < rows.length; r++) {
+          const row = rows[r];
+          const dateStr = (row[0] || "").trim();
+          const name = (row[1] || "").trim();
+          const rawCategory = (row[2] || "").trim();
+          const amountStr = (row[3] || "").trim();
+          const qtyStr = (row[4] || "").trim();
+
+          // Skip missing name
+          if (!name) {
+            skipped++;
+            continue;
+          }
+
+          // Skip invalid amount (must be number > 0)
+          const amount = parseFloat(amountStr);
+          if (!Number.isFinite(amount) || amount <= 0) {
+            skipped++;
+            continue;
+          }
+
+          // Strict date validation (YYYY-MM-DD, no overflow dates)
+          if (!isValidISODate(dateStr)) {
+            skipped++;
+            continue;
+          }
+
+          // Quantity defaults to 1
+          const qty = parseInt(qtyStr, 10);
+          const quantity = Number.isFinite(qty) && qty > 0 ? qty : 1;
+
+          // Category defaults to Other
+          const category = resolveCategory(rawCategory);
+
+          // Dedup: compare against existing expenses only (never against other imported rows)
+          const key =
+            dateStr.substring(0, 10) +
+            "|" +
+            name.toLowerCase() +
+            "|" +
+            amount.toFixed(2) +
+            "|" +
+            quantity;
+          const count = freqMap.get(key) || 0;
+          if (count > 0) {
+            freqMap.set(key, count - 1);
+            skipped++;
+          } else {
+            newExpenses.push({
+              id: crypto.randomUUID(),
+              name,
+              amount,
+              quantity,
+              date: dateStr,
+              category,
+            });
+            imported++;
+          }
+        }
+
+        if (imported > 0) {
+          const merged = [...existing, ...newExpenses];
+          saveExpenses(merged);
+          renderCurrentList(merged);
+          updateCurrentSummary(merged);
+        }
+
+        showInfoToast(`Imported ${imported}, skipped ${skipped}`);
+        fileInput.value = "";
+      } catch {
+        showInfoToast("Failed to import CSV.");
+        fileInput.value = "";
+      }
+    };
+    reader.readAsText(file);
   });
 
   // ── Selection Mode & Bulk Actions ─────────────────────────────────────
