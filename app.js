@@ -79,6 +79,22 @@ const CATEGORY_ICONS = {
   Other:         "\u{1F4E6}",
 };
 
+const CATEGORY_COLORS = {
+  Food:          "var(--chart-1)",
+  Transport:     "var(--chart-2)",
+  "Load & Data": "var(--chart-3)",
+  School:        "var(--chart-4)",
+  Bills:         "var(--chart-5)",
+  Shopping:      "var(--chart-6)",
+  Health:        "var(--chart-7)",
+  Fun:           "var(--chart-8)",
+  Other:         "var(--chart-9)",
+};
+
+/** Fallback color for any category not in the map above. */
+const CATEGORY_COLOR_FALLBACK = "var(--color-text)";
+
+
 /* =============================================
    Storage Helpers
    ============================================= */
@@ -484,19 +500,11 @@ function renderChart(expenses, categoryFilter = "", searchTerm = "") {
   const sorted = Object.entries(totals).sort((a, b) => b[1] - a[1]);
 
   const grandTotal = sorted.reduce((sum, [, amt]) => sum + amt, 0);
-  const chartColors = [
-    "var(--chart-1)",
-    "var(--chart-2)",
-    "var(--chart-3)",
-    "var(--chart-4)",
-    "var(--chart-5)",
-  ];
-
   let cumulativePercent = 0;
 
   sorted.forEach(([category, amount], index) => {
     const percent = (amount / grandTotal) * 100;
-    const color = chartColors[index % chartColors.length];
+    const color = CATEGORY_COLORS[category] || CATEGORY_COLOR_FALLBACK;
 
     const slice = document.createElementNS("http://www.w3.org/2000/svg", "circle");
     slice.setAttribute("class", "donut-slice");
@@ -717,6 +725,8 @@ function init() {
   const confirmDialogTitle = document.getElementById("confirm-dialog-title");
   const dialogCancelButton = document.getElementById("btn-dialog-cancel");
   const dialogConfirmButton = document.getElementById("btn-dialog-confirm");
+  const deletePreviewItems = document.getElementById("delete-preview-items");
+  const deletePreviewTotal = document.getElementById("delete-preview-total");
   const infoToast = document.getElementById("info-toast");
   const infoToastMessage = document.getElementById("info-toast-message");
   const toast = document.getElementById("toast");
@@ -1219,14 +1229,27 @@ function init() {
       const count = selectedCheckboxes.length;
       if (count === 0) return;
 
-      if (count < 5) {
-        executeBulkDelete(selectedCheckboxes);
-      } else {
-        if (confirmDialog && confirmDialogTitle) {
-          confirmDialogTitle.textContent = `Delete ${count} expenses?`;
-          confirmDialog.showModal();
-          if (dialogCancelButton) dialogCancelButton.focus();
+      if (confirmDialog && confirmDialogTitle) {
+        confirmDialogTitle.textContent = `Delete ${count} expenses?`;
+
+        // Populate the preview card with the count and combined total.
+        const selectedIds = new Set(selectedCheckboxes.map(cb => cb.dataset.id));
+        const expenses = loadExpenses();
+        let total = 0;
+        expenses.forEach(exp => {
+          if (selectedIds.has(exp.id)) {
+            total += exp.amount * (exp.quantity || 1);
+          }
+        });
+        if (deletePreviewItems) {
+          deletePreviewItems.textContent = `${count} item${count === 1 ? "" : "s"} selected`;
         }
+        if (deletePreviewTotal) {
+          deletePreviewTotal.textContent = `Total: ${formatCurrency(total)}`;
+        }
+
+        confirmDialog.showModal();
+        if (dialogCancelButton) dialogCancelButton.focus();
       }
     });
   }

@@ -24,6 +24,7 @@
   --color-muted:      #666666;
   --color-border:     #d4d4d4;
   --color-error:      #ef4444;
+  --color-danger:     #ef4444;
   --color-badge-bg:   #eeeeee;
   --color-badge-txt:  #444444;
   --color-charcoal:   #27272a;
@@ -36,6 +37,10 @@
   --chart-3: #FF9800;
   --chart-4: #F44336;
   --chart-5: #9C27B0;
+  --chart-6: #2196F3;
+  --chart-7: #00BCD4;
+  --chart-8: #E91E63;
+  --chart-9: #795548;
 
   --radius:    12px;
   --radius-sm: 8px;
@@ -60,6 +65,7 @@
   --color-muted:      #b5b5b5;
   --color-border:     #383838;
   --color-error:      #fca5a5;
+  --color-danger:     #ef4444;
   --color-badge-bg:   #292929;
   --color-badge-txt:  #dedede;
   --color-charcoal:   #242424;
@@ -783,6 +789,111 @@ select {
   min-width: 80px;
 }
 
+/* ── Redesigned bulk-delete modal ─────────────────────────── */
+.modal-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.modal-warning-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-danger-surface);
+  color: var(--color-error);
+}
+
+.dialog-subtitle {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.delete-preview-card {
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.delete-preview-items {
+  font-size: 0.875rem;
+  color: var(--color-muted);
+}
+
+.delete-preview-total {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+/* Ghost cancel button */
+.btn-modal-cancel {
+  background: transparent;
+  border: none;
+  color: var(--color-muted);
+  font: inherit;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0 1.25rem;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) {
+  .btn-modal-cancel:hover {
+    background: var(--color-badge-bg);
+    color: var(--color-text);
+  }
+}
+
+.btn-modal-cancel:active {
+  background: var(--color-badge-bg);
+}
+
+.btn-modal-cancel:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* Solid red pill delete button */
+.btn-modal-delete {
+  background: var(--color-danger);
+  border: none;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0 1.5rem;
+  cursor: pointer;
+  transition: opacity var(--transition), transform var(--transition);
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) {
+  .btn-modal-delete:hover {
+    opacity: 0.9;
+  }
+}
+
+.btn-modal-delete:active {
+  transform: scale(0.97);
+}
+
+.btn-modal-delete:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
 /* =============================================
    Currency Dialog & Picker
    ============================================= */
@@ -1261,9 +1372,11 @@ body.selection-mode #info-toast {
 .list-controls .filter-bar .filter-select {
   width: auto;
   flex-shrink: 0;
-  max-width: 45%;
-  min-width: 130px;
-  padding: 0.65rem 2rem 0.65rem 0.75rem;
+  max-width: 140px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0.5rem 1.75rem 0.5rem 0.75rem;
   font-size: 0.9rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);

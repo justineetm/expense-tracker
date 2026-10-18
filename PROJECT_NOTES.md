@@ -55,7 +55,7 @@ PeraLog is a client-side expense tracker PWA. All data is stored in localStorage
 - Weekly & monthly summary stats in a minimalist flex row with a 1px vertical divider. Labels are muted and all-caps; amounts are bold gold at a reduced size so they don't compete with the Monthly Budget block.
 - Form validation with inline error messages
 - Dark/light theme toggle (persisted in localStorage)
-- Service Worker: `peralog-v21` cache for offline support
+- Service Worker: `peralog-v25` cache for offline support
 
 ## Header & Dashboard Redesign (v18)
 
@@ -78,7 +78,8 @@ PeraLog is a client-side expense tracker PWA. All data is stored in localStorage
 - `renderChart(expenses, categoryFilter)` groups filtered expenses by category, sums amounts (including quantity), sorts by amount descending, and renders `<circle>` slices with `stroke-dasharray` and `stroke-dashoffset`.
 - Called from `renderCurrentList()` so it updates on add, delete, edit, import, and category filter changes.
 - Falls back to a "No data yet" message when there are no visible expenses.
-- 5 CSS chart color variables (`--chart-1` through `--chart-5`) in `:root` and `[data-theme="dark"]`.
+- 9 CSS chart color variables (`--chart-1` through `--chart-9`) in `:root`.
+- Category-to-color mapping via the `CATEGORY_COLORS` constant object — each category always renders with the same color regardless of filtering or sort order, preventing color duplication and inconsistency.
 
 ## Search Feature (v21)
 
