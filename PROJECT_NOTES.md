@@ -55,7 +55,15 @@ PeraLog is a client-side expense tracker PWA. All data is stored in localStorage
 - Weekly & monthly summary cards with a two-line monthly-budget status: a large remaining/over-budget amount and a muted "of [budget]" line, alongside a 44px pencil edit button that stays fixed on narrow screens.
 - Form validation with inline error messages
 - Dark/light theme toggle (persisted in localStorage)
-- Service Worker: `peralog-v12` cache for offline support
+- Service Worker: `peralog-v14` cache for offline support
+
+## Row Layout Fix
+
+Meta line ("Category · Date · Qty") in Spending List rows now wraps gracefully on narrow screens:
+- `.expense-meta` no longer forces `white-space: nowrap` — it wraps to a second line when the info block is too narrow.
+- `.meta-date` span keeps the date together with `white-space: nowrap` so "Category · 2024-01-15" never breaks mid-date.
+- `.long-amount` CSS class reduces font size (0.85rem) for amounts wider than 9 characters (e.g. "₱10,000,000") to prevent right-edge overflow.
+- Amount column (`.expense-amount`) and delete icon column (`.expense-right`) keep `flex-shrink: 0` so the full amount is always visible.
 
 ## Colors
 - Gold is the primary accent: `#C9A227` with `#E0B93A` for emphasis. Gold text on light surfaces uses `#8A6D00`, while text on gold uses `#1a1a1d`.

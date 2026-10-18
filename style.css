@@ -1028,9 +1028,10 @@ body.selection-mode #info-toast {
   gap: 0.35rem;
   font-size: 0.8rem;
   color: var(--color-muted);
+}
+
+.meta-date {
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .expense-amount {
@@ -1040,6 +1041,10 @@ body.selection-mode #info-toast {
   white-space: nowrap;
   flex-shrink: 0;
   margin-left: 0.5rem;
+}
+
+.long-amount {
+  font-size: 0.85rem;
 }
 
 .empty-state {

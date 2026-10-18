@@ -335,6 +335,8 @@ function createExpenseItem(expense) {
   const icon = CATEGORY_ICONS[displayCategory];
   const qty = expense.quantity || 1;
   const totalAmount = expense.amount * qty;
+  const formattedTotal = formatCurrency(totalAmount);
+  const isLongAmount = formattedTotal.length > 9;
   const qtyText = qty > 1 ? ` \u00B7 ${qty} \u00D7 ${formatCurrency(expense.amount)}` : "";
 
   li.innerHTML = `
@@ -348,11 +350,11 @@ function createExpenseItem(expense) {
     <div class="expense-info">
       <span class="expense-name">${escapeHTML(expense.name)}</span>
       <div class="expense-meta">
-        <span>${escapeHTML(displayCategory)} \u00B7 ${formatDate(expense.date)}${qtyText}</span>
+        <span>${escapeHTML(displayCategory)} \u00B7 <span class="meta-date">${formatDate(expense.date)}</span>${qtyText}</span>
       </div>
     </div>
     <div class="expense-right">
-      <span class="expense-amount">${formatCurrency(totalAmount)}</span>
+      <span class="expense-amount ${isLongAmount ? 'long-amount' : ''}">${formattedTotal}</span>
       <button
         class="btn-delete"
         aria-label="Delete ${escapeHTML(expense.name)}"
