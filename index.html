@@ -189,39 +189,46 @@
             <button
               type="button"
               id="btn-import"
-              class="btn-secondary btn-icon"
+              class="btn-ghost"
               title="Import CSV"
               aria-label="Import CSV"
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-  <!-- The downward arrow -->
-  <path d="M12 3v13" />
-  <path d="M8 12l4 4 4-4" />
-  <!-- The unbroken bottom curve -->
-  <path d="M5 15a7 7 0 0 0 14 0" />
-</svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 3v13" />
+                <path d="M8 12l4 4 4-4" />
+                <path d="M5 15a7 7 0 0 0 14 0" />
+              </svg>
             </button>
             <button
               type="button"
               id="btn-export"
-              class="btn-secondary btn-icon"
+              class="btn-ghost"
               title="Export CSV"
               aria-label="Export CSV"
             >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-  <!-- The upward arrow -->
-  <path d="M12 16V3" />
-  <path d="M8 7l4-4 4 4" />
-  <!-- The perfectly matching bottom curve -->
-  <path d="M5 15a7 7 0 0 0 14 0" />
-</svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 16V3" />
+                <path d="M8 7l4-4 4 4" />
+                <path d="M5 15a7 7 0 0 0 14 0" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              id="btn-select"
+              class="btn-ghost"
+              title="Select expenses"
+              aria-label="Select expenses"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 11l3 3L22 4" />
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+              </svg>
             </button>
           </div>
         </div>
         <div class="list-controls">
           <div class="filter-bar">
-            <label for="filter-category" class="filter-label">Filter</label>
-            <select id="filter-category" class="filter-select">
+            <select id="filter-category" class="filter-select" aria-label="Filter by category">
               <option value="">All Categories</option>
               <option value="Food">&#x1F354; Food</option>
               <option value="Transport">&#x1F68C; Transport</option>
@@ -234,13 +241,6 @@
               <option value="Other">&#x1F4E6; Other</option>
             </select>
           </div>
-          <button
-            type="button"
-            id="btn-select"
-            class="btn-secondary"
-            title="Select expenses"
-            aria-label="Select expenses"
-          >Select</button>
           <input type="file" id="file-import" class="hidden" accept=".csv" />
         </div>
         <ul id="expense-list" class="expense-list"></ul>

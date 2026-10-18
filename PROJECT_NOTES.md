@@ -41,7 +41,17 @@ PeraLog is a client-side expense tracker PWA. All data is stored in localStorage
 - CSV exports contain raw numbers without commas or currency symbols
 - No currency conversion is performed — only the display symbol/format changes
 
+## UI & Layout
+- Spending List: Modern compact layout with thin dividers instead of card borders.
+- Header: Brand logo and title on left, 44px ghost icon buttons for Import/Export/Select on right.
+- Row Layout: 
+  - Left: Category icon in a circle.
+  - Middle: Bold item name (truncated) over a muted "Category · Date · Qty" meta line.
+  - Right: Total amount and a muted delete trash icon.
+- Filter: Slim standalone dropdown above the list.
+
 ## Other Features
+
 - Weekly & monthly summary cards with a two-line monthly-budget status: a large remaining/over-budget amount and a muted "of [budget]" line, alongside a 44px pencil edit button that stays fixed on narrow screens.
 - Form validation with inline error messages
 - Dark/light theme toggle (persisted in localStorage)

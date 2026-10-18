@@ -335,6 +335,7 @@ function createExpenseItem(expense) {
   const icon = CATEGORY_ICONS[displayCategory];
   const qty = expense.quantity || 1;
   const totalAmount = expense.amount * qty;
+  const qtyText = qty > 1 ? ` \u00B7 ${qty} \u00D7 ${formatCurrency(expense.amount)}` : "";
 
   li.innerHTML = `
     <input
@@ -343,12 +344,11 @@ function createExpenseItem(expense) {
       data-id="${escapeHTML(expense.id)}"
       aria-label="Select ${escapeHTML(expense.name)}"
     />
+    <div class="expense-category-circle" aria-hidden="true">${icon}</div>
     <div class="expense-info">
       <span class="expense-name">${escapeHTML(expense.name)}</span>
-      <span class="expense-quantity">${qty} × ${formatCurrency(expense.amount)}</span>
       <div class="expense-meta">
-        <span class="expense-date">${formatDate(expense.date)}</span>
-        <span class="expense-badge">${icon} ${escapeHTML(displayCategory)}</span>
+        <span>${escapeHTML(displayCategory)} \u00B7 ${formatDate(expense.date)}${qtyText}</span>
       </div>
     </div>
     <div class="expense-right">
