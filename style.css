@@ -124,8 +124,9 @@ body {
 
 .header-brand h1 {
   font-size: 1.5rem;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: -0.5px;
+  color: var(--color-text);
   margin: 0;
   line-height: 1.2;
 }
@@ -361,31 +362,32 @@ body {
   min-height: 48px;
   padding: 0 1.25rem;
   margin-top: 0.75rem;
-  border: none;
-  border-radius: var(--radius);
-  background: var(--gold);
-  color: var(--on-gold);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--gold);
+  border-radius: 12px;
+  background: var(--color-surface);
+  color: var(--gold);
   font-family: inherit;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: background var(--transition);
+  transition: background var(--transition), border-color var(--transition);
 }
 
 @media (hover: hover) {
   .expense-toggle:hover {
-    background: var(--gold-strong);
+    background: var(--color-badge-bg);
   }
 }
 
 .expense-toggle:active {
-  background: var(--gold-strong);
+  background: var(--color-badge-bg);
   transform: scale(0.96);
 }
 
 .expense-toggle:focus-visible {
-  outline: 3px solid var(--color-focus);
+  outline: 2px solid var(--gold);
   outline-offset: 2px;
 }
 
@@ -419,6 +421,19 @@ body {
   min-height: 0;
 }
 
+#expense-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 1rem;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.form-inner-spacing {
+  padding: 1.5rem 0;
+}
+
 /* Reduce motion fallback */
 @media (prefers-reduced-motion: no-preference) {
   .expense-form-wrapper {
@@ -433,8 +448,10 @@ body {
 }
 
 label {
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   font-weight: 600;
+  color: var(--color-muted);
+  margin-bottom: 6px;
 }
 
 input[type="text"],
@@ -443,12 +460,12 @@ input[type="date"],
 select {
   width: 100%;
   box-sizing: border-box;
-  padding: 0.875rem;
-  border: 1.5px solid var(--color-border);
-  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
   font-size: 1rem;
   color: var(--color-text);
-  background: var(--color-input);
+  background: var(--color-surface);
   transition: border-color var(--transition), box-shadow var(--transition);
   appearance: none;
   -webkit-appearance: none;
@@ -474,9 +491,10 @@ input::placeholder { color: var(--color-muted); }
 
 input:focus,
 select:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-focus);
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-color: transparent;
+  box-shadow: none;
 }
 
 input.invalid,
@@ -503,14 +521,14 @@ select {
   display: block;
   width: 100%;
   box-sizing: border-box;
-  padding: 0.875rem;
-  margin-top: 0.5rem;
+  padding: 0.875rem 1rem;
+  border: none;
+  border-radius: 12px;
   background: #16a34a;
   color: #ffffff;
   font-size: 1rem;
-  font-weight: 600;
-  border: none;
-  border-radius: var(--radius-sm);
+  font-weight: bold;
+  min-height: 48px;
   cursor: pointer;
   letter-spacing: 0.3px;
   transition: background var(--transition), transform var(--transition);
@@ -623,13 +641,13 @@ select {
 }
 
 .btn-cancel {
-  min-height: 44px;
+  min-height: 48px;
   padding: 0.75rem 1rem;
   border: 1.5px solid var(--color-primary);
-  border-radius: var(--radius-sm);
+  border-radius: 12px;
   background: transparent;
   color: var(--color-primary);
-  font: inherit;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -1071,49 +1089,52 @@ body.selection-mode #info-toast {
 
 /* Two-column grid that sits above the form */
 .summary-grid {
-  display: grid;
+  display: flex;
+  align-items: center;
   width: 100%;
-  max-width: 100%;
   box-sizing: border-box;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 0.875rem;
   margin-bottom: 1.25rem;
 }
 
-.summary-card {
+.summary-stat {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-  padding: 1.1rem 0.75rem;
-  min-width: 0;
-  background: var(--color-charcoal);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  text-align: center;
+  gap: 0.25rem;
+}
+
+.summary-divider {
+  width: 1px;
+  height: 2rem;
+  background: var(--color-border);
+  margin: 0 1rem;
 }
 
 .summary-label {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
-  color: #d4d4d4;
+  color: var(--color-muted);
   letter-spacing: 0.4px;
   text-transform: uppercase;
 }
 
 .summary-amount {
-  font-size: clamp(1.35rem, 5.5vw, 1.8rem);
+  font-size: 1.25rem;
   font-weight: 800;
   color: var(--color-gold);
   letter-spacing: -0.5px;
   line-height: 1.1;
 }
 
-/* On very narrow screens (< 320 px) stack the cards */
+/* On very narrow screens (< 320 px) stack the stats */
 @media (max-width: 319px) {
   .summary-grid {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .summary-divider {
+    display: none;
   }
 }
 
@@ -1255,10 +1276,6 @@ body.selection-mode #info-toast {
 
   .summary-grid {
     gap: 0.625rem;
-  }
-
-  .summary-card {
-    padding: 0.875rem 0.5rem;
   }
 
   .list-header {

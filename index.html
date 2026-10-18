@@ -16,7 +16,6 @@
       <header class="app-header">
         <div class="header-left">
           <div class="header-brand">
-            <img src="img/icon-192.png" width="32" height="32" alt="PeraLog Logo" />
             <h1>PeraLog</h1>
           </div>
           <p class="subtitle">Track where your money goes</p>
@@ -38,14 +37,15 @@
         >🇵🇭 PHP</button>
       </header>
 
-      <!-- Summary Cards -->
+      <!-- Summary Stats -->
       <section class="summary-grid" aria-label="Spending summary">
-        <div class="summary-card" id="summary-week">
-          <span class="summary-label">&#x1F4C5; This Week</span>
+        <div class="summary-stat">
+          <span class="summary-label">This Week</span>
           <span class="summary-amount" id="total-week"></span>
         </div>
-        <div class="summary-card" id="summary-month">
-          <span class="summary-label">&#x1F4C6; This Month</span>
+        <div class="summary-divider"></div>
+        <div class="summary-stat">
+          <span class="summary-label">This Month</span>
           <span class="summary-amount" id="total-month"></span>
         </div>
       </section>
@@ -108,74 +108,76 @@
           inert
         >
           <form id="expense-form" novalidate>
-            <div class="form-group">
-              <label for="item-name">Item Name</label>
-              <input
-                type="text"
-                id="item-name"
-                placeholder="e.g. Coffee, Bus ticket..."
-                maxlength="60"
-                required
-              />
-              <span class="field-error" id="error-name"></span>
-            </div>
+            <div class="form-inner-spacing">
+              <div class="form-group">
+                <label for="item-name">Item Name</label>
+                <input
+                  type="text"
+                  id="item-name"
+                  placeholder="e.g. Coffee, Bus ticket..."
+                  maxlength="60"
+                  required
+                />
+                <span class="field-error" id="error-name"></span>
+              </div>
 
-            <div class="form-group">
-              <label for="amount">Price each (PHP)</label>
-              <input
-                type="number"
-                id="amount"
-                placeholder="0.00"
-                min="0.01"
-                step="0.01"
-                required
-              />
-              <span class="field-error" id="error-amount"></span>
-            </div>
+              <div class="form-group">
+                <label for="amount">Price each (PHP)</label>
+                <input
+                  type="number"
+                  id="amount"
+                  placeholder="0.00"
+                  min="0.01"
+                  step="0.01"
+                  required
+                />
+                <span class="field-error" id="error-amount"></span>
+              </div>
 
-            <div class="form-group">
-              <label for="quantity">Quantity</label>
-              <input
-                type="number"
-                id="quantity"
-                min="1"
-                step="1"
-                value="1"
-                required
-              />
-              <span class="field-error" id="error-quantity"></span>
-            </div>
+              <div class="form-group">
+                <label for="quantity">Quantity</label>
+                <input
+                  type="number"
+                  id="quantity"
+                  min="1"
+                  step="1"
+                  value="1"
+                  required
+                />
+                <span class="field-error" id="error-quantity"></span>
+              </div>
 
-            <div class="form-group">
-              <label for="expense-date">Date</label>
-              <input
-                type="date"
-                id="expense-date"
-                required
-              />
-              <span class="field-error" id="error-date"></span>
-            </div>
+              <div class="form-group">
+                <label for="expense-date">Date</label>
+                <input
+                  type="date"
+                  id="expense-date"
+                  required
+                />
+                <span class="field-error" id="error-date"></span>
+              </div>
 
-            <div class="form-group">
-              <label for="category">Category</label>
-              <select id="category" required>
-                <option value="" disabled selected>Select a category</option>
-                <option value="Food">&#x1F354; Food</option>
-                <option value="Transport">&#x1F68C; Transport</option>
-                <option value="Load &amp; Data">&#x1F4F1; Load &amp; Data</option>
-                <option value="School">&#x1F393; School</option>
-                <option value="Bills">&#x1F9FE; Bills</option>
-                <option value="Shopping">&#x1F6CD;&#xFE0F; Shopping</option>
-                <option value="Health">&#x1F3E5; Health</option>
-                <option value="Fun">&#x1F389; Fun</option>
-                <option value="Other">&#x1F4E6; Other</option>
-              </select>
-              <span class="field-error" id="error-category"></span>
-            </div>
+              <div class="form-group">
+                <label for="category">Category</label>
+                <select id="category" required>
+                  <option value="" disabled selected>Select a category</option>
+                  <option value="Food">&#x1F354; Food</option>
+                  <option value="Transport">&#x1F68C; Transport</option>
+                  <option value="Load &amp; Data">&#x1F4F1; Load &amp; Data</option>
+                  <option value="School">&#x1F393; School</option>
+                  <option value="Bills">&#x1F9FE; Bills</option>
+                  <option value="Shopping">&#x1F6CD;&#xFE0F; Shopping</option>
+                  <option value="Health">&#x1F3E5; Health</option>
+                  <option value="Fun">&#x1F389; Fun</option>
+                  <option value="Other">&#x1F4E6; Other</option>
+                </select>
+                <span class="field-error" id="error-category"></span>
+              </div>
 
-            <div class="form-actions">
-              <button type="button" id="btn-cancel" class="btn-cancel hidden">Cancel</button>
-              <button type="submit" class="btn-primary">Add Expense</button>
+              <div class="form-actions">
+                <button type="button" id="btn-cancel" class="btn-cancel hidden">Cancel</button>
+                <button type="submit" class="btn-primary">Add Expense</button>
+              </div>
             </div>
           </form>
         </div>

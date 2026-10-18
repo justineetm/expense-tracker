@@ -43,7 +43,7 @@ PeraLog is a client-side expense tracker PWA. All data is stored in localStorage
 
 ## UI & Layout
 - Spending List: Modern compact layout with thin dividers instead of card borders.
-- Header: Brand logo and title on left, 44px ghost icon buttons for Import/Export/Select on right.
+- Header: Typographic "PeraLog" wordmark on left, 44px ghost icon buttons for theme/currency on right.
 - Row Layout: 
   - Left: Category icon in a circle.
   - Middle: Bold item name (truncated) over a muted "Category · Date · Qty" meta line.
@@ -52,12 +52,18 @@ PeraLog is a client-side expense tracker PWA. All data is stored in localStorage
 
 ## Other Features
 
-- Weekly & monthly summary cards with a two-line monthly-budget status: a large remaining/over-budget amount and a muted "of [budget]" line, alongside a 44px pencil edit button that stays fixed on narrow screens.
+- Weekly & monthly summary stats in a minimalist flex row with a 1px vertical divider. Labels are muted and all-caps; amounts are bold gold at a reduced size so they don't compete with the Monthly Budget block.
 - Form validation with inline error messages
 - Dark/light theme toggle (persisted in localStorage)
-- Service Worker: `peralog-v14` cache for offline support
+- Service Worker: `peralog-v18` cache for offline support
 
-## Row Layout Fix
+## Header & Dashboard Redesign (v18)
+
+- Removed the `` logo from the header; "PeraLog" is now a clean typographic wordmark (`font-weight: 800`, `letter-spacing: -0.5px`).
+- Summary cards converted to a minimalist flex row (`#total-week`, `#total-month`) with a 1px vertical divider instead of separate boxes.
+- Summary labels reduced to `0.7rem`, muted color, all-caps.
+- Summary amounts reduced to `1.25rem`, bold gold, slightly smaller to avoid competing with the Monthly Budget block.
+- On screens below 320px, stats stack vertically and the divider hides.
 
 Meta line ("Category · Date · Qty") in Spending List rows now wraps gracefully on narrow screens:
 - `.expense-meta` no longer forces `white-space: nowrap` — it wraps to a second line when the info block is too narrow.
@@ -78,6 +84,17 @@ Meta line ("Category · Date · Qty") in Spending List rows now wraps gracefully
 - Always starts collapsed on load; no state remembered between visits.
 - On open, focuses `#item-name` with `{ preventScroll: true }` after a 400ms timeout (or immediately if `prefers-reduced-motion` is on).
 - On successful save: collapses accordion, shows `#info-toast` ("Expense added" / "Expense updated" for edits).
+
+## UI Modernization (v15)
+
+Added a sleek, modern, "app-like" feel to the Add Expense form while preserving the gold/dark theme:
+
+- **Toggle Bar (`#expense-toggle`)**: Replaced the solid gold background with a neutral `var(--color-surface)` surface, gold text, a 4px gold left-border accent, 1px border on all sides, 12px border-radius, and a 48px min-height. Hover/active states use subtle `var(--color-badge-bg)` with gold border on hover.
+- **Input Fields**: Modernized with a soft `var(--color-surface)` filled background, 1px subtle border, 12px border-radius, and 12px 16px padding. Removed the harsh 1.5px default border. Focus state uses a crisp 2px solid gold `outline` with 2px offset.
+- **Input Labels**: Reduced to 0.85rem, muted gray color, with 6px bottom margin for clean alignment above inputs.
+- **Button Layout**: Premium upgrade for "Add Expense" (green) and "Cancel" buttons — 12px border-radius, bold font-weight, and 48px min-height.
+- **Form Spacing**: The form container now uses `display: flex; flex-direction: column; gap: 16px` for breathing room. Collapsible wrapper (`#expense-form-collapsible`) has 1.5rem padding so inputs don't touch screen edges.
+- **Animation Preserved**: The `0fr` → `1fr` CSS grid animation on the form wrapper is unchanged.
 - Validation errors keep the form open; error messages and Save button are not clipped.
 - Edit mode: tapping a row uses the shared accordion opener, pre-fills item name, price, quantity, date, and category, scrolls the toggle bar into view, and changes its label to "Edit expense" without focusing an input or opening the mobile keyboard.
 - Cancel button collapses accordion and resets the form/labels.
