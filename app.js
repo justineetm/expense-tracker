@@ -7,6 +7,8 @@ const STORAGE_KEY = "expense_tracker_v1";
 const THEME_STORAGE_KEY = "expense_tracker_theme";
 const BUDGET_STORAGE_KEY = "expense_budget";
 const CURRENCY_STORAGE_KEY = "peralog_currency";
+const BACKUP_STORAGE_KEY = "peralog_last_backup";
+const SNOOZE_STORAGE_KEY = "peralog_backup_snooze";
 
 /** Currency code -> human-readable name for the picker dialog. */
 const CURRENCY_LABELS = {
@@ -855,6 +857,7 @@ function init() {
     renderList(expenses, expenseList, emptyState, filterSel.value, searchTerm);
     renderChart(expenses, filterSel.value, searchTerm);
     renderQuickAdd(expenses);
+    renderBackupBanner();
   }
 
   const updateCurrentSummary = (expenses) => {
@@ -1055,7 +1058,14 @@ function init() {
     renderCurrentList(loadExpenses());
   });
 
-  exportButton.addEventListener("click", () => {
+  exportButton.addEventListener("click", () => exportBackup());
+
+  /**
+   * Build CSV (BOM, headers, raw numbers) and attempt one-tap share;
+   * falls back to download link when sharing is unavailable or fails.
+   * Saves backup timestamp on success or fallback; does nothing on AbortError.
+   */
+  async function exportBackup() {
     const expenses = loadExpenses();
     if (expenses.length === 0) {
       showInfoToast("No expenses to export yet!");
@@ -1079,17 +1089,93 @@ function init() {
       csvContent += `${date},${name},${category},${price},${qty},${total}\n`;
     });
 
+    const file = new File([csvContent], `peralog-backup-${getTodayISO()}.csv`, { type: "text/csv" });
+    const now = Date.now();
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file] });
+        localStorage.setItem(BACKUP_STORAGE_KEY, String(now));
+        renderBackupBanner();
+        return;
+      } catch (err) {
+        if (err.name === "AbortError") {
+          return; // User closed share menu — do nothing
+        }
+        // Any other error falls through to download fallback
+      }
+    }
+
+    // Fallback: download link
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.setAttribute("href", url);
-    link.setAttribute("download", `expenses-${getTodayISO()}.csv`);
+    link.setAttribute("download", `peralog-backup-${getTodayISO()}.csv`);
     link.style.visibility = "hidden";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-  });
+    localStorage.setItem(BACKUP_STORAGE_KEY, String(now));
+    renderBackupBanner();
+  }
+
+  /**
+   * Show the backup reminder banner when:
+   * - expenses.length >= 5
+   * - no last backup OR last backup older than 7 days
+   * - no snooze OR snooze older than 1 day
+   */
+  function shouldShowBackupBanner(expenses) {
+    if (!Array.isArray(expenses) || expenses.length < 5) return false;
+
+    const lastBackup = localStorage.getItem(BACKUP_STORAGE_KEY);
+    const lastSnooze = localStorage.getItem(SNOOZE_STORAGE_KEY);
+    const now = Date.now();
+    const MS_DAY = 86400000;
+
+    if (lastBackup) {
+      const age = now - parseInt(lastBackup, 10);
+      if (age < 7 * MS_DAY) return false;
+    }
+
+    if (lastSnooze) {
+      const age = now - parseInt(lastSnooze, 10);
+      if (age < MS_DAY) return false;
+    }
+
+    return true;
+  }
+
+  function renderBackupBanner() {
+    const banner = document.getElementById("backup-banner");
+    if (!banner) return;
+    const expenses = loadExpenses();
+    if (shouldShowBackupBanner(expenses)) {
+      banner.classList.remove("hidden");
+    } else {
+      banner.classList.add("hidden");
+    }
+  }
+
+  // Backup banner buttons
+  const btnBackupNow = document.getElementById("btn-backup-now");
+  const btnBackupLater = document.getElementById("btn-backup-later");
+
+  if (btnBackupNow) {
+    btnBackupNow.addEventListener("click", () => {
+      exportBackup();
+      renderBackupBanner();
+    });
+  }
+
+  if (btnBackupLater) {
+    btnBackupLater.addEventListener("click", () => {
+      localStorage.setItem(SNOOZE_STORAGE_KEY, String(Date.now()));
+      renderBackupBanner();
+    });
+  }
 
   // ========== CSV Import ==========
   const importButton = document.getElementById("btn-import");
@@ -1524,6 +1610,7 @@ function init() {
   renderCurrentList(saved);
   updateCurrentSummary(saved);
   updateCurrencyLabels();
+  renderBackupBanner();
 
   // Auto-open currency picker on first launch (no saved currency and no expenses)
   const savedCurrencyForAuto = localStorage.getItem(CURRENCY_STORAGE_KEY);
