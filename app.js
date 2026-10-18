@@ -838,7 +838,7 @@ function init() {
     const symbol = getCurrencySymbol();
     const amountLabel = document.querySelector('label[for="amount"]');
     if (amountLabel) {
-      amountLabel.textContent = `Price each (${currentCurrencyCode})`;
+      amountLabel.textContent = `Amount (${currentCurrencyCode})`;
     }
     const budgetLabel = document.querySelector('label[for="budget-input"]');
     if (budgetLabel) {
