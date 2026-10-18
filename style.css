@@ -276,9 +276,45 @@ body {
 }
 
 .budget-status {
+  flex: 1;
   min-width: 0;
-  font-size: 0.95rem;
-  font-weight: 700;
+  margin: 0;
+}
+
+.budget-status-primary,
+.budget-status-secondary {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.budget-status-primary {
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.budget-status-primary.budget-status-warning {
+  color: var(--color-error);
+}
+
+.budget-status-secondary {
+  margin-top: 0.1rem;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.btn-budget-icon {
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.btn-budget-icon svg {
+  width: 20px;
+  height: 20px;
 }
 
 .progress-bar {

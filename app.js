@@ -209,7 +209,7 @@ function updateSummary(expenses, budgetUi) {
 /** Render the appropriate budget state from the current monthly total. */
 function renderBudget(monthTotal, budgetUi) {
   const budget = loadBudget();
-  const { emptyState, formState, activeState, status, progressFill, progressBar } = budgetUi;
+  const { emptyState, formState, activeState, statusPrimary, statusSecondary, progressFill, progressBar } = budgetUi;
 
   emptyState.classList.toggle("hidden", Boolean(budget));
   formState.classList.add("hidden");
@@ -226,9 +226,11 @@ function renderBudget(monthTotal, budgetUi) {
       ? "progress-orange"
       : "progress-green";
 
-  status.textContent = remaining < 0
+  statusPrimary.textContent = remaining < 0
     ? `Over budget by ${formatCurrency(Math.abs(remaining))}`
-    : `${formatCurrency(remaining)} left of ${formatCurrency(budget)}`;
+    : `${formatCurrency(remaining)} left`;
+  statusPrimary.classList.toggle("budget-status-warning", remaining < 0);
+  statusSecondary.textContent = `of ${formatCurrency(budget)}`;
   progressFill.style.width = `${cappedPercentage}%`;
   progressFill.className = `progress-fill ${colorClass}`;
   progressBar.setAttribute("aria-valuenow", String(Math.min(Math.round(percentage), 100)));
@@ -601,7 +603,8 @@ function init() {
     activeState: document.getElementById("budget-active-state"),
     input: document.getElementById("budget-input"),
     error: document.getElementById("budget-error"),
-    status: document.getElementById("budget-status"),
+    statusPrimary: document.getElementById("budget-status-primary"),
+    statusSecondary: document.getElementById("budget-status-secondary"),
     progressFill: document.getElementById("progress-fill"),
     progressBar: document.querySelector(".progress-bar"),
   };

@@ -69,8 +69,16 @@
 
         <div id="budget-active-state" class="budget-state hidden">
           <div class="budget-status-row">
-            <p id="budget-status" class="budget-status"></p>
-            <button type="button" id="budget-edit" class="btn-budget btn-budget-secondary">Edit</button>
+            <p id="budget-status" class="budget-status">
+              <span id="budget-status-primary" class="budget-status-primary"></span>
+              <span id="budget-status-secondary" class="budget-status-secondary"></span>
+            </p>
+            <button type="button" id="budget-edit" class="btn-budget btn-budget-secondary btn-budget-icon" aria-label="Edit budget" title="Edit budget">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+              </svg>
+            </button>
           </div>
           <div class="progress-bar" role="progressbar" aria-label="Monthly budget used" aria-valuemin="0" aria-valuemax="100">
             <div id="progress-fill" class="progress-fill"></div>

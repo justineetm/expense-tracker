@@ -42,10 +42,10 @@ PeraLog is a client-side expense tracker PWA. All data is stored in localStorage
 - No currency conversion is performed — only the display symbol/format changes
 
 ## Other Features
-- Weekly & monthly summary cards with budget progress bar (green/orange/red thresholds)
+- Weekly & monthly summary cards with a two-line monthly-budget status: a large remaining/over-budget amount and a muted "of [budget]" line, alongside a 44px pencil edit button that stays fixed on narrow screens.
 - Form validation with inline error messages
 - Dark/light theme toggle (persisted in localStorage)
-- Service Worker: `peralog-v10` cache for offline support
+- Service Worker: `peralog-v11` cache for offline support
 
 
 ## Collapsible Add Expense Accordion
