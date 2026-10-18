@@ -29,13 +29,13 @@ const CURRENCY_LABELS = {
 const CURRENCY_FLAGS = {
   PHP: "\u{1F1F5}\u{1F1ED}", // 🇵🇭
   USD: "\u{1F1FA}\u{1F1F8}", // 🇺🇸
-  CAD: "\u{1F1E0}\u{1F1E9}", // 🇨🇦
+  CAD: "\u{1F1E8}\u{1F1E6}", // 🇨🇦
   AUD: "\u{1F1E6}\u{1F1FA}", // 🇦🇺
-  SGD: "\u{1F1F8}\u{1F1E4}", // 🇸🇬
+  SGD: "\u{1F1F8}\u{1F1EC}", // 🇸🇬
   HKD: "\u{1F1ED}\u{1F1F0}", // 🇭🇰
   AED: "\u{1F1E6}\u{1F1EA}", // 🇦🇪
   SAR: "\u{1F1F8}\u{1F1E6}", // 🇸🇦
-  QAR: "\u{1F1F6}\u{1F1E4}", // 🇶🇦
+  QAR: "\u{1F1F6}\u{1F1E6}", // 🇶🇦
   JPY: "\u{1F1EF}\u{1F1F5}", // 🇯🇵
   KRW: "\u{1F1F0}\u{1F1F7}", // 🇰🇷
   GBP: "\u{1F1EC}\u{1F1E7}", // 🇬🇧
@@ -137,6 +137,8 @@ function getTodayISO() {
   return `${year}-${month}-${day}`;
 }
 
+const parseLocalDate = (str) => { const [y, m, d] = str.substring(0,10).split('-'); return new Date(y, m - 1, d); };
+
 /**
  * Returns a Date set to midnight (00:00:00.000) of the given date
  * in local time — used for clean day-boundary comparisons.
@@ -196,7 +198,7 @@ function calcSummaryTotals(expenses) {
 
   return expenses.reduce(
     (acc, exp) => {
-      const d = new Date(exp.date);
+      const d = parseLocalDate(exp.date);
 
       // Skip future-dated entries entirely
       if (d >= tomorrow) return acc;
@@ -302,7 +304,7 @@ function validateForm(nameInput, amountInput, quantityInput, dateInput, category
     dateInput.classList.add("invalid");
     errorDate.textContent = "Please select a date.";
     valid = false;
-  } else if (new Date(dateInput.value) > new Date()) {
+  } else if (dateInput.value > getTodayISO()) {
     dateInput.classList.add("invalid");
     errorDate.textContent = "Future dates are not allowed.";
     valid = false;
@@ -333,7 +335,7 @@ function escapeHTML(str) {
 
 /** Format an ISO date string into a short human-readable label. */
 function formatDate(iso) {
-  return new Date(iso).toLocaleDateString(undefined, {
+  return parseLocalDate(iso).toLocaleDateString(undefined, {
     month: "short", day: "numeric", year: "numeric",
   });
 }
@@ -417,6 +419,8 @@ function renderList(expenses, listEl, emptyEl, categoryFilter = "", searchTerm =
 
   if (visibleExpenses.length === 0) {
     emptyEl.classList.remove("hidden");
+    const countEl = document.getElementById("expense-count");
+    if (countEl) countEl.textContent = "(0)";
     return;
   }
 
@@ -641,7 +645,7 @@ function isValidISODate(dateStr) {
 function resolveCategory(raw) {
   const trimmed = raw.trim();
   if (Object.hasOwn(CATEGORY_ICONS, trimmed)) return trimmed;
-  const stripped = trimmed.replace(/[\u{1F300}-\u{1F9FF}]/gu, "").trim();
+  const stripped = trimmed.replace(/[\u{1F300}-\u{1F9FF}\uFE0F]/gu, "").trim();
   if (Object.hasOwn(CATEGORY_ICONS, stripped)) return stripped;
   return "Other";
 }
@@ -1519,6 +1523,7 @@ function init() {
   const saved = loadExpenses();
   renderCurrentList(saved);
   updateCurrentSummary(saved);
+  updateCurrencyLabels();
 
   // Auto-open currency picker on first launch (no saved currency and no expenses)
   const savedCurrencyForAuto = localStorage.getItem(CURRENCY_STORAGE_KEY);
@@ -1543,7 +1548,3 @@ function init() {
 
 // Entry point — safe to call even if the script loads before some elements
 document.addEventListener("DOMContentLoaded", init);
-
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("./sw.js")
-}
