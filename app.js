@@ -391,6 +391,8 @@ function renderList(expenses, listEl, emptyEl, categoryFilter = "") {
   }
 
   emptyEl.classList.add("hidden");
+  const countEl = document.getElementById("expense-count");
+  if (countEl) countEl.textContent = `(${visibleExpenses.length})`;
   [...visibleExpenses]
     .sort((a, b) => {
       const dateA = a.date.substring(0, 10);
