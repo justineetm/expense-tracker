@@ -8,21 +8,26 @@
 }
 
 :root {
-  --color-bg:         #f3f4f6;
+  --gold:             #C9A227;
+  --gold-strong:      #E0B93A;
+  --gold-text-on-light: #8A6D00;
+  --on-gold:          #1a1a1d;
+  --color-bg:         #f5f5f5;
   --color-surface:    #ffffff;
   --color-input:      #ffffff;
-  --color-primary:    #4f46e5;
-  --color-primary-hv: #4338ca;
-  --color-primary-text: #ffffff;
-  --color-focus:      rgba(79, 70, 229, 0.15);
-  --color-text:       #1e293b;
-  --color-muted:      #64748b;
-  --color-border:     #cbd5e1;
+  --color-primary:    var(--gold-text-on-light);
+  --color-primary-hv: var(--gold);
+  --color-primary-text: var(--on-gold);
+  --color-accent:     var(--gold);
+  --color-focus:      rgba(201, 162, 39, 0.35);
+  --color-text:       #262626;
+  --color-muted:      #666666;
+  --color-border:     #d4d4d4;
   --color-error:      #ef4444;
-  --color-badge-bg:   #ede9fe;
-  --color-badge-txt:  #6d28d9;
+  --color-badge-bg:   #eeeeee;
+  --color-badge-txt:  #444444;
   --color-charcoal:   #27272a;
-  --color-gold:       #C9A227;
+  --color-gold:       var(--gold);
   --color-danger-surface: #fee2e2;
   --color-danger-surface-active: #fecaca;
 
@@ -33,21 +38,26 @@
 }
 
 [data-theme="dark"] {
-  --color-bg:         #0e0e10;
-  --color-surface:    #1a1a1d;
-  --color-input:      #121214;
-  --color-primary:    #d4d4d4;
-  --color-primary-hv: #f5f5f5;
-  --color-primary-text: #121212;
-  --color-focus:      rgba(212, 212, 212, 0.2);
-  --color-text:       #f8fafc;
-  --color-muted:      #94a3b8;
-  --color-border:     #283548;
+  --gold:             #C9A227;
+  --gold-strong:      #E0B93A;
+  --gold-text-on-light: #8A6D00;
+  --on-gold:          #1a1a1d;
+  --color-bg:         #111111;
+  --color-surface:    #1c1c1c;
+  --color-input:      #151515;
+  --color-primary:    var(--gold-strong);
+  --color-primary-hv: var(--gold);
+  --color-primary-text: var(--on-gold);
+  --color-accent:     var(--gold);
+  --color-focus:      rgba(224, 185, 58, 0.5);
+  --color-text:       #f5f5f5;
+  --color-muted:      #b5b5b5;
+  --color-border:     #383838;
   --color-error:      #fca5a5;
-  --color-badge-bg:   #222f46;
-  --color-badge-txt:  #cbd5e1;
-  --color-charcoal:   #1e293b;
-  --color-gold:       #C9A227;
+  --color-badge-bg:   #292929;
+  --color-badge-txt:  #dedede;
+  --color-charcoal:   #242424;
+  --color-gold:       var(--gold-strong);
   --color-danger-surface: #451a1a;
   --color-danger-surface-active: #7f1d1d;
   --shadow:           0 2px 10px rgba(0, 0, 0, 0.35);
@@ -136,10 +146,10 @@ body {
   min-width: 44px;
   min-height: 44px;
   padding: 0;
-  border: 1.5px solid var(--color-border);
+  border: 1.5px solid var(--color-primary);
   border-radius: 50%;
   background: var(--color-surface);
-  color: var(--color-text);
+  color: var(--color-primary);
   font-size: 1.1rem;
   cursor: pointer;
   transition: background var(--transition), border-color var(--transition), transform var(--transition);
@@ -172,10 +182,10 @@ body {
   min-width: 44px;
   min-height: 44px;
   padding: 0.45rem 0.85rem;
-  border: 1.5px solid var(--color-border);
+  border: 1.5px solid var(--color-primary);
   border-radius: 999px; /* pill */
   background: var(--color-surface);
-  color: var(--color-text);
+  color: var(--color-primary);
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
@@ -260,8 +270,8 @@ body {
 
 .btn-budget-primary {
   width: 100%;
-  background: var(--color-primary);
-  color: var(--color-primary-text);
+  background: var(--gold);
+  color: var(--on-gold);
 }
 
 .budget-input-row .btn-budget-primary {
@@ -270,9 +280,9 @@ body {
 
 .btn-budget-secondary {
   flex-shrink: 0;
-  border-color: var(--color-border);
+  border-color: var(--color-primary);
   background: transparent;
-  color: var(--color-text);
+  color: var(--color-primary);
 }
 
 .budget-status {
@@ -353,8 +363,8 @@ body {
   margin-top: 0.75rem;
   border: none;
   border-radius: var(--radius);
-  background: var(--color-accent, #4f46e5);
-  color: #ffffff;
+  background: var(--gold);
+  color: var(--on-gold);
   font-family: inherit;
   font-size: 1rem;
   font-weight: 600;
@@ -365,12 +375,12 @@ body {
 
 @media (hover: hover) {
   .expense-toggle:hover {
-    background: var(--color-primary-hv, #4338ca);
+    background: var(--gold-strong);
   }
 }
 
 .expense-toggle:active {
-  background: var(--color-primary-hv, #4338ca);
+  background: var(--gold-strong);
   transform: scale(0.96);
 }
 
@@ -477,7 +487,7 @@ select.invalid {
 
 /* Custom select arrow */
 select {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.75rem center;
   padding-right: 2.25rem;
@@ -537,10 +547,10 @@ select {
 .btn-secondary {
   min-height: 44px;
   padding: 0.75rem 1rem;
-  border: 1.5px solid var(--color-border);
+  border: 1.5px solid var(--color-primary);
   border-radius: var(--radius-sm);
   background: transparent;
-  color: var(--color-text);
+  color: var(--color-primary);
   font: inherit;
   font-weight: 600;
   cursor: pointer;
@@ -576,10 +586,10 @@ select {
 .btn-cancel {
   min-height: 44px;
   padding: 0.75rem 1rem;
-  border: 1.5px solid var(--color-border);
+  border: 1.5px solid var(--color-primary);
   border-radius: var(--radius-sm);
   background: transparent;
-  color: var(--color-text);
+  color: var(--color-primary);
   font: inherit;
   font-weight: 600;
   cursor: pointer;
@@ -729,10 +739,10 @@ select {
 .currency-grid button {
   min-height: 44px;
   padding: 0.5rem 0.75rem;
-  border: 1.5px solid var(--color-border);
+  border: 1.5px solid var(--color-primary);
   border-radius: var(--radius-sm);
   background: var(--color-surface);
-  color: var(--color-text);
+  color: var(--color-primary);
   font: inherit;
   font-size: 0.9rem;
   font-weight: 500;
@@ -750,6 +760,13 @@ select {
 .currency-grid button:focus-visible {
   outline: 3px solid var(--color-focus);
   outline-offset: 2px;
+}
+
+.currency-grid button[aria-checked="true"],
+.currency-grid button.selected {
+  border-color: var(--gold);
+  background: var(--gold);
+  color: var(--on-gold);
 }
 
 /* =============================================
@@ -797,7 +814,8 @@ select {
 
 .btn-bulk-secondary {
   background: transparent;
-  color: var(--color-text);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 @media (hover: hover) {
@@ -1015,7 +1033,7 @@ body.selection-mode #info-toast {
 .summary-label {
   font-size: 0.75rem;
   font-weight: 600;
-  color: #94a3b8;
+  color: #d4d4d4;
   letter-spacing: 0.4px;
   text-transform: uppercase;
 }

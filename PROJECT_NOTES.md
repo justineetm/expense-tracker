@@ -45,7 +45,11 @@ PeraLog is a client-side expense tracker PWA. All data is stored in localStorage
 - Weekly & monthly summary cards with a two-line monthly-budget status: a large remaining/over-budget amount and a muted "of [budget]" line, alongside a 44px pencil edit button that stays fixed on narrow screens.
 - Form validation with inline error messages
 - Dark/light theme toggle (persisted in localStorage)
-- Service Worker: `peralog-v11` cache for offline support
+- Service Worker: `peralog-v12` cache for offline support
+
+## Colors
+- Gold is the primary accent: `#C9A227` with `#E0B93A` for emphasis. Gold text on light surfaces uses `#8A6D00`, while text on gold uses `#1a1a1d`.
+- Light mode uses white cards and neutral greys; dark mode uses neutral charcoal and grey surfaces. Green is reserved for the Add Expense button and under-budget progress, while orange/red communicate budget warnings and errors.
 
 
 ## Collapsible Add Expense Accordion
