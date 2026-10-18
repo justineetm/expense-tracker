@@ -31,6 +31,12 @@
   --color-danger-surface: #fee2e2;
   --color-danger-surface-active: #fecaca;
 
+  --chart-1: #C9A227;
+  --chart-2: #4CAF50;
+  --chart-3: #FF9800;
+  --chart-4: #F44336;
+  --chart-5: #9C27B0;
+
   --radius:    12px;
   --radius-sm: 8px;
   --shadow:    0 2px 8px rgba(0, 0, 0, 0.06);
@@ -1277,7 +1283,77 @@ body.selection-mode #info-toast {
   box-shadow: 0 0 0 3px var(--color-focus);
 }
 
-/* Keep the filter easy to use on narrow mobile screens. */
+/* =============================================
+   Spending by Category Donut Chart
+   ============================================= */
+.chart-card {
+  padding: 1.25rem;
+}
+
+.chart-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.donut-chart {
+  width: 150px;
+  height: 150px;
+  transform: rotate(-90deg);
+  border-radius: 50%;
+}
+
+.donut-bg {
+  fill: transparent;
+  stroke: var(--color-border);
+  stroke-width: 4;
+}
+
+.donut-slice {
+  fill: transparent;
+  stroke-width: 4;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.4s ease, stroke-dashoffset 0.4s ease;
+}
+
+.chart-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 140px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-label {
+  color: var(--color-text);
+}
+
+.legend-value {
+  color: var(--color-muted);
+  margin-left: auto;
+  font-size: 0.85rem;
+}
+
+.chart-empty {
+  text-align: center;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  padding-top: 60px;
+}
 @media (max-width: 480px) {
   .card {
     padding: 1rem;

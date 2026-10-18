@@ -411,6 +411,103 @@ function renderList(expenses, listEl, emptyEl, categoryFilter = "") {
 }
 
 /* =============================================
+   Spending by Category Donut Chart
+   ============================================= */
+
+/**
+ * Render a donut chart showing spending breakdown by category.
+ * Uses the r="15.9155" trick (circumference = 100) so stroke-dasharray
+ * maps directly to percentages.
+ * @param {Array} expenses
+ * @param {string} categoryFilter
+ */
+function renderChart(expenses, categoryFilter = "") {
+  const svg = document.querySelector(".donut-chart");
+  const legend = document.getElementById("chart-legend");
+  if (!svg || !legend) return;
+
+  // Clear existing slices and legend
+  svg.querySelectorAll(".donut-slice").forEach(el => el.remove());
+  legend.innerHTML = "";
+
+  // Filter visible expenses by category
+  const visible = expenses.filter(exp => {
+    if (!categoryFilter) return true;
+    if (categoryFilter === "Other") {
+      return exp.category === "Other" || !Object.hasOwn(CATEGORY_ICONS, exp.category);
+    }
+    return exp.category === categoryFilter;
+  });
+
+  if (visible.length === 0) {
+    const emptyMsg = document.createElement("div");
+    emptyMsg.className = "chart-empty";
+    emptyMsg.textContent = "No data yet";
+    legend.appendChild(emptyMsg);
+    return;
+  }
+
+  // Group by category and sum amounts (including quantity)
+  const totals = {};
+  visible.forEach(exp => {
+    const qty = exp.quantity || 1;
+    totals[exp.category] = (totals[exp.category] || 0) + exp.amount * qty;
+  });
+
+  // Sort categories by amount descending
+  const sorted = Object.entries(totals).sort((a, b) => b[1] - a[1]);
+
+  const grandTotal = sorted.reduce((sum, [, amt]) => sum + amt, 0);
+  const chartColors = [
+    "var(--chart-1)",
+    "var(--chart-2)",
+    "var(--chart-3)",
+    "var(--chart-4)",
+    "var(--chart-5)",
+  ];
+
+  let cumulativePercent = 0;
+
+  sorted.forEach(([category, amount], index) => {
+    const percent = (amount / grandTotal) * 100;
+    const color = chartColors[index % chartColors.length];
+
+    const slice = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    slice.setAttribute("class", "donut-slice");
+    slice.setAttribute("r", "15.9155");
+    slice.setAttribute("cx", "16");
+    slice.setAttribute("cy", "16");
+    slice.setAttribute("stroke", color);
+    slice.setAttribute("stroke-dasharray", `${percent} 100`);
+    slice.setAttribute("stroke-dashoffset", `${cumulativePercent}`);
+    svg.appendChild(slice);
+
+    cumulativePercent += percent;
+
+    // Legend item
+    const item = document.createElement("div");
+    item.className = "legend-item";
+
+    const dot = document.createElement("div");
+    dot.className = "legend-dot";
+    dot.style.backgroundColor = color;
+    item.appendChild(dot);
+
+    const label = document.createElement("span");
+    label.className = "legend-label";
+    label.textContent = category;
+    item.appendChild(label);
+
+    const value = document.createElement("span");
+    value.className = "legend-value";
+    value.textContent = `${percent.toFixed(0)}%`;
+    item.appendChild(value);
+
+    legend.appendChild(item);
+  });
+}
+
+/* =============================================
    CSV Import Helpers (vanilla JS, no libraries)
    ============================================= */
 
@@ -712,6 +809,7 @@ function init() {
 
   const renderCurrentList = (expenses) => {
     renderList(expenses, expenseList, emptyState, filterSel.value);
+    renderChart(expenses, filterSel.value);
   };
 
   const updateCurrentSummary = (expenses) => {
