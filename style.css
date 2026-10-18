@@ -446,11 +446,91 @@ body {
   padding: 1.5rem 0;
 }
 
-/* Reduce motion fallback */
-@media (prefers-reduced-motion: no-preference) {
-  .expense-form-wrapper {
-    transition: grid-template-rows 0.35s ease;
-  }
+/* =============================================
+   Quick Add Chip Carousel
+   ============================================= */
+.quick-add-section {
+  margin: 0 0 1rem;
+}
+
+.quick-add-heading {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--color-muted);
+  margin: 0 0 0.5rem 0.25rem;
+}
+
+.quick-add-carousel {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding: 0.25rem 0.25rem 0.5rem;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+
+.quick-add-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.quick-add-label,
+.quick-add-heading {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--color-muted);
+  padding-left: 0.5rem;
+  padding-bottom: 0.35rem;
+}
+
+.quick-add-section .quick-add-heading {
+  padding-left: 0.25rem;
+  padding-bottom: 0;
+  margin: 0 0 0.5rem 0;
+}
+
+.quick-add-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  padding: 0.5rem 0.9rem;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition), border-color var(--transition), transform var(--transition);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.quick-add-chip:hover {
+  background: var(--color-input);
+  border-color: var(--color-primary);
+  transform: scale(1.04);
+}
+
+.quick-add-chip:active {
+  transform: scale(0.96);
+}
+
+.quick-add-chip:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+.quick-add-chip .chip-emoji {
+  font-size: 1.1rem;
+  line-height: 1;
 }
 .form-group {
   display: flex;
@@ -1101,6 +1181,7 @@ body.selection-mode #info-toast {
 .expense-item {
   display: flex;
   width: 100%;
+  min-width: 0;
   align-self: stretch;
   box-sizing: border-box;
   align-items: center;
@@ -1116,6 +1197,7 @@ body.selection-mode #info-toast {
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
+  overflow: hidden;
 }
 
 .expense-item:last-child {
@@ -1144,8 +1226,10 @@ body.selection-mode #info-toast {
   display: flex;
   flex-direction: column;
   gap: 0.1rem;
-  flex: 1;
+  flex: 1 1 auto;
   min-width: 0;
+  flex-shrink: 1;
+  overflow: hidden;
 }
 
 .expense-name {
@@ -1160,9 +1244,16 @@ body.selection-mode #info-toast {
 .expense-meta {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
+  row-gap: 0.1rem;
+  column-gap: 0.35rem;
   gap: 0.35rem;
   font-size: 0.8rem;
   color: var(--color-muted);
+  min-width: 0;
+  flex-shrink: 1;
+  overflow: hidden;
+  overflow-wrap: break-word;
 }
 
 .meta-date {
@@ -1174,7 +1265,12 @@ body.selection-mode #info-toast {
   font-weight: 500;
   color: var(--color-text);
   white-space: nowrap;
-  flex-shrink: 0;
+  flex-shrink: 1;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
   margin-left: 0.5rem;
 }
 
@@ -1268,6 +1364,8 @@ body.selection-mode #info-toast {
   align-items: center;
   gap: 0.5rem;
   flex-shrink: 0;
+  min-width: 0;
+  max-width: 55%;
 }
 
 .btn-delete {

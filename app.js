@@ -94,6 +94,15 @@ const CATEGORY_COLORS = {
 /** Fallback color for any category not in the map above. */
 const CATEGORY_COLOR_FALLBACK = "var(--color-text)";
 
+/* =============================================
+   Quick Add Templates
+   ============================================= */
+const QUICK_TEMPLATES = [
+  { name: "SUV ticket", amount: 50, category: "Transport", emoji: "🚐" },
+  { name: "coffee", amount: 120, category: "Food", emoji: "☕" },
+  { name: "load 100", amount: 100, category: "Load & Data", emoji: "📱" },
+];
+
 
 /* =============================================
    Storage Helpers
@@ -847,11 +856,54 @@ function init() {
     const searchTerm = searchInput.value;
     renderList(expenses, expenseList, emptyState, filterSel.value, searchTerm);
     renderChart(expenses, filterSel.value, searchTerm);
-  };
+  }
 
   const updateCurrentSummary = (expenses) => {
     updateSummary(expenses, budgetUi);
   };
+
+  /* =============================================
+   Quick Add Chips
+   ============================================= */
+  function renderQuickAdd() {
+    const carousel = document.getElementById("quick-add-carousel");
+    if (!carousel) return;
+
+    // Clear any previous chips
+    carousel.innerHTML = "";
+
+    QUICK_TEMPLATES.forEach(template => {
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "quick-add-chip";
+      chip.setAttribute("data-name", template.name);
+      chip.setAttribute("aria-label", `Quick add ${template.name} for ${template.amount}`);
+      const nameSpan = document.createElement("span");
+      nameSpan.textContent = `${template.emoji} ${template.name}`;
+      const amtSpan = document.createElement("span");
+      amtSpan.style.color = "var(--color-muted)";
+      amtSpan.style.fontSize = "0.8rem";
+      amtSpan.textContent = `₱${template.amount}`;
+      chip.append(nameSpan, amtSpan);
+      chip.addEventListener("click", () => {
+        const expense = {
+          id: crypto.randomUUID(),
+          name: template.name,
+          amount: template.amount,
+          quantity: 1,
+          date: getTodayISO(),
+          category: template.category,
+        };
+        const expenses = loadExpenses();
+        expenses.push(expense);
+        saveExpenses(expenses);
+        renderCurrentList(expenses);
+        updateCurrentSummary(expenses);
+        showInfoToast(`${template.emoji} ${template.name} added`);
+      });
+      carousel.appendChild(chip);
+    });
+  }
 
   const resetExpenseForm = () => {
     editId = null;
@@ -1430,6 +1482,7 @@ function init() {
   dateInput.max = today;
   const saved = loadExpenses();
   renderCurrentList(saved);
+  renderQuickAdd();
   updateCurrentSummary(saved);
 
   // Auto-open currency picker on first launch (no saved currency and no expenses)
