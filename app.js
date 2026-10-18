@@ -373,16 +373,28 @@ function createExpenseItem(expense) {
  * @param {HTMLElement} listEl
  * @param {HTMLElement} emptyEl
  */
-function renderList(expenses, listEl, emptyEl, categoryFilter = "") {
+function renderList(expenses, listEl, emptyEl, categoryFilter = "", searchTerm = "") {
   listEl.innerHTML = "";
 
+  const term = searchTerm.toLowerCase();
   const visibleExpenses = expenses.filter(exp => {
-    if (!categoryFilter) return true;
-    if (categoryFilter === "Other") {
-      return exp.category === "Other" || !Object.hasOwn(CATEGORY_ICONS, exp.category);
+    // Category filter
+    if (!categoryFilter) {
+      // no category filter
+    } else if (categoryFilter === "Other") {
+      if (!(exp.category === "Other" || !Object.hasOwn(CATEGORY_ICONS, exp.category))) {
+        return false;
+      }
+    } else if (exp.category !== categoryFilter) {
+      return false;
     }
 
-    return exp.category === categoryFilter;
+    // Search text filter (AND logic with category)
+    if (term && !exp.name.toLowerCase().includes(term)) {
+      return false;
+    }
+
+    return true;
   });
 
   if (visibleExpenses.length === 0) {
@@ -421,7 +433,7 @@ function renderList(expenses, listEl, emptyEl, categoryFilter = "") {
  * @param {Array} expenses
  * @param {string} categoryFilter
  */
-function renderChart(expenses, categoryFilter = "") {
+function renderChart(expenses, categoryFilter = "", searchTerm = "") {
   const svg = document.querySelector(".donut-chart");
   const legend = document.getElementById("chart-legend");
   if (!svg || !legend) return;
@@ -430,13 +442,27 @@ function renderChart(expenses, categoryFilter = "") {
   svg.querySelectorAll(".donut-slice").forEach(el => el.remove());
   legend.innerHTML = "";
 
-  // Filter visible expenses by category
+  const term = searchTerm.toLowerCase();
+
+  // Filter visible expenses by category AND search term
   const visible = expenses.filter(exp => {
-    if (!categoryFilter) return true;
-    if (categoryFilter === "Other") {
-      return exp.category === "Other" || !Object.hasOwn(CATEGORY_ICONS, exp.category);
+    // Category filter
+    if (!categoryFilter) {
+      // no category filter
+    } else if (categoryFilter === "Other") {
+      if (!(exp.category === "Other" || !Object.hasOwn(CATEGORY_ICONS, exp.category))) {
+        return false;
+      }
+    } else if (exp.category !== categoryFilter) {
+      return false;
     }
-    return exp.category === categoryFilter;
+
+    // Search text filter (AND logic with category)
+    if (term && !exp.name.toLowerCase().includes(term)) {
+      return false;
+    }
+
+    return true;
   });
 
   if (visible.length === 0) {
@@ -515,9 +541,9 @@ function renderChart(expenses, categoryFilter = "") {
  * Parses a CSV string into an array of rows (each row is an array of fields).
  * Handles: UTF-8 BOM (removed by caller), quoted fields with embedded commas,
  * doubled quotes for escaping, \r\n and \n line endings, and blank lines (skipped).
- * @param {string} text
- * @returns {string[][]}
- */
+ * @param {string} text */
+/** @type {HTMLInputElement} */
+const searchInput = document.getElementById("search-input");
 function parseCSV(text) {
   const rows = [];
   let row = [];
@@ -808,8 +834,9 @@ function init() {
   }
 
   const renderCurrentList = (expenses) => {
-    renderList(expenses, expenseList, emptyState, filterSel.value);
-    renderChart(expenses, filterSel.value);
+    const searchTerm = searchInput.value;
+    renderList(expenses, expenseList, emptyState, filterSel.value, searchTerm);
+    renderChart(expenses, filterSel.value, searchTerm);
   };
 
   const updateCurrentSummary = (expenses) => {
@@ -919,6 +946,10 @@ function init() {
   });
 
   filterSel.addEventListener("change", () => {
+    renderCurrentList(loadExpenses());
+  });
+
+  searchInput.addEventListener("input", () => {
     renderCurrentList(loadExpenses());
   });
 

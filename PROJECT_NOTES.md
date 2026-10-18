@@ -55,7 +55,7 @@ PeraLog is a client-side expense tracker PWA. All data is stored in localStorage
 - Weekly & monthly summary stats in a minimalist flex row with a 1px vertical divider. Labels are muted and all-caps; amounts are bold gold at a reduced size so they don't compete with the Monthly Budget block.
 - Form validation with inline error messages
 - Dark/light theme toggle (persisted in localStorage)
-- Service Worker: `peralog-v20` cache for offline support
+- Service Worker: `peralog-v21` cache for offline support
 
 ## Header & Dashboard Redesign (v18)
 
@@ -80,8 +80,13 @@ PeraLog is a client-side expense tracker PWA. All data is stored in localStorage
 - Falls back to a "No data yet" message when there are no visible expenses.
 - 5 CSS chart color variables (`--chart-1` through `--chart-5`) in `:root` and `[data-theme="dark"]`.
 
-- Added a dynamic item count (`#expense-count`) next to the "Spending List" title.
-- Renders as `(${count})` (e.g., `(4)`) and updates whenever the list is re-rendered or filtered.
+## Search Feature (v21)
+
+- Added a real-time text search bar (`#search-input`) inside the Spending List controls, alongside the category filter dropdown.
+- Search matches expenses by item name (case-insensitive substring match).
+- Search and category filter work together with AND logic — both must match for an expense to appear.
+- The item count, donut chart, and list all update automatically as you type.
+- Styled consistently with modern form inputs: `var(--color-surface)` background, `1px` border, `12px` border-radius, `12px 16px` padding, gold focus outline.
 - Styled at `0.85rem` with muted color so it doesn't compete with the title.
 
 Meta line ("Category · Date · Qty") in Spending List rows now wraps gracefully on narrow screens:
