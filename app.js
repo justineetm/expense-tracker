@@ -94,14 +94,7 @@ const CATEGORY_COLORS = {
 /** Fallback color for any category not in the map above. */
 const CATEGORY_COLOR_FALLBACK = "var(--color-text)";
 
-/* =============================================
-   Quick Add Templates
-   ============================================= */
-const QUICK_TEMPLATES = [
-  { name: "SUV ticket", amount: 50, category: "Transport", emoji: "🚐" },
-  { name: "coffee", amount: 120, category: "Food", emoji: "☕" },
-  { name: "load 100", amount: 100, category: "Load & Data", emoji: "📱" },
-];
+/* Quick Add is fully dynamic — derived from expense history (see renderQuickAdd). */
 
 
 /* =============================================
@@ -543,7 +536,8 @@ function renderChart(expenses, categoryFilter = "", searchTerm = "") {
 
     const value = document.createElement("span");
     value.className = "legend-value";
-    value.textContent = `${percent.toFixed(0)}%`;
+    const rounded = Math.round(percent);
+    value.textContent = (rounded === 0 && amount > 0) ? "<1%" : `${rounded}%`;
     item.appendChild(value);
 
     legend.appendChild(item);
@@ -856,6 +850,7 @@ function init() {
     const searchTerm = searchInput.value;
     renderList(expenses, expenseList, emptyState, filterSel.value, searchTerm);
     renderChart(expenses, filterSel.value, searchTerm);
+    renderQuickAdd(expenses);
   }
 
   const updateCurrentSummary = (expenses) => {
@@ -863,27 +858,68 @@ function init() {
   };
 
   /* =============================================
-   Quick Add Chips
+   Quick Add Chips (dynamic — top frequent purchases)
    ============================================= */
-  function renderQuickAdd() {
+  function getQuickAddTemplates(expenses) {
+    if (!Array.isArray(expenses) || expenses.length === 0) return [];
+    const freq = new Map();
+    for (const exp of expenses) {
+      const name = (exp.name || "").trim();
+      if (!name) continue;
+      const amount = Number(exp.amount) || 0;
+      const category = exp.category || "Other";
+      const key = `${name.toLowerCase()}|${amount.toFixed(2)}|${category}`;
+      if (!freq.has(key)) {
+        freq.set(key, { name, amount, category, count: 0 });
+      }
+      freq.get(key).count += 1;
+    }
+    return [...freq.values()]
+      .filter(t => t.count > 1)
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 3);
+  }
+
+  function extractLeadingEmoji(text) {
+    if (!text) return "";
+    const match = String(text).match(/^(\p{Extended_Pictographic}(?:\uFE0F|\u200D\p{Extended_Pictographic})*)/u);
+    return match ? match[1] : "";
+  }
+
+  function renderQuickAdd(expenses) {
     const carousel = document.getElementById("quick-add-carousel");
     if (!carousel) return;
+    const section = document.querySelector(".quick-add-section");
+
+    const list = Array.isArray(expenses) ? expenses : loadExpenses();
 
     // Clear any previous chips
     carousel.innerHTML = "";
 
-    QUICK_TEMPLATES.forEach(template => {
+    const templates = getQuickAddTemplates(list);
+
+    if (templates.length === 0) {
+      if (section) section.style.display = "none";
+      return;
+    }
+
+    if (section) section.style.display = "block";
+
+    templates.forEach(template => {
+      const emoji = extractLeadingEmoji(template.name)
+        || CATEGORY_ICONS[template.category]
+        || "";
       const chip = document.createElement("button");
       chip.type = "button";
       chip.className = "quick-add-chip";
       chip.setAttribute("data-name", template.name);
       chip.setAttribute("aria-label", `Quick add ${template.name} for ${template.amount}`);
       const nameSpan = document.createElement("span");
-      nameSpan.textContent = `${template.emoji} ${template.name}`;
+      nameSpan.textContent = emoji ? `${emoji} ${template.name}` : template.name;
       const amtSpan = document.createElement("span");
       amtSpan.style.color = "var(--color-muted)";
       amtSpan.style.fontSize = "0.8rem";
-      amtSpan.textContent = `₱${template.amount}`;
+      amtSpan.textContent = `${getCurrencySymbol()}${template.amount}`;
       chip.append(nameSpan, amtSpan);
       chip.addEventListener("click", () => {
         const expense = {
@@ -894,12 +930,12 @@ function init() {
           date: getTodayISO(),
           category: template.category,
         };
-        const expenses = loadExpenses();
-        expenses.push(expense);
-        saveExpenses(expenses);
-        renderCurrentList(expenses);
-        updateCurrentSummary(expenses);
-        showInfoToast(`${template.emoji} ${template.name} added`);
+        const current = loadExpenses();
+        current.push(expense);
+        saveExpenses(current);
+        renderCurrentList(current);
+        updateCurrentSummary(current);
+        showInfoToast(`${emoji ? emoji + " " : ""}${template.name} added`);
       });
       carousel.appendChild(chip);
     });
@@ -1482,7 +1518,6 @@ function init() {
   dateInput.max = today;
   const saved = loadExpenses();
   renderCurrentList(saved);
-  renderQuickAdd();
   updateCurrentSummary(saved);
 
   // Auto-open currency picker on first launch (no saved currency and no expenses)
