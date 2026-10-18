@@ -537,55 +537,45 @@ function init() {
   // Accordion state
   let accordionOpen = false;
 
-  // ── Accordion: expand/collapse expense form ────────────────────────────
-  const toggleAccordion = () => {
-    const isReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // ── Accordion: one source of truth for every open/close path ──────────
+  const openAccordion = () => {
+    accordionOpen = true;
+    expenseToggle.classList.add("open");
+    expenseCollapsible.classList.add("open");
+    expenseToggle.setAttribute("aria-expanded", "true");
+    expenseCollapsible.setAttribute("aria-expanded", "true");
+    expenseCollapsible.removeAttribute("inert");
+  };
 
-    // If closed and editing, cancel edit, reset form, collapse
-    if (!accordionOpen && editId) {
-      editId = null;
-      expenseCollapsible.setAttribute("aria-expanded", "false");
-      expenseCollapsible.setAttribute("inert", "");
-      form.reset();
-      cancelButton.classList.add("hidden");
-      submitButton.textContent = "Add Expense";
-      form.querySelectorAll(".field-error").forEach(el => (el.textContent = ""));
+  const closeAccordion = () => {
+    accordionOpen = false;
+    expenseToggle.classList.remove("open");
+    expenseCollapsible.classList.remove("open");
+    expenseToggle.setAttribute("aria-expanded", "false");
+    expenseCollapsible.setAttribute("aria-expanded", "false");
+    expenseCollapsible.setAttribute("inert", "");
+  };
+
+  const toggleAccordion = () => {
+    if (accordionOpen) {
+      resetExpenseForm();
       return;
     }
 
-    accordionOpen = !accordionOpen;
-    expenseCollapsible.setAttribute("aria-expanded", accordionOpen);
+    editId = null;
+    submitButton.textContent = "Add Expense";
+    cancelButton.classList.add("hidden");
+    const toggleLabel = expenseToggle.querySelector(".toggle-label");
+    if (toggleLabel) toggleLabel.textContent = "+ Add expense";
+    openAccordion();
 
-    if (accordionOpen) {
-      expenseToggle.setAttribute("aria-expanded", "true");
-      expenseCollapsible.removeAttribute("inert");
-      form.querySelectorAll(".field-error").forEach(el => (el.textContent = ""));
-      submitButton.textContent = editId ? "Save changes" : "Add Expense";
-      cancelButton.classList.toggle("hidden", !editId);
-
-      if (editId) {
-        // In edit mode: expand, pre-fill, scroll into view, focus first field
-        expenseCollapsible.scrollIntoView({ behavior: "smooth", block: "start" });
-        nameInput.focus({ preventScroll: true });
-      } else {
-        // First load: expand and focus after transition
-        const focusTimer = setTimeout(() => {
-          nameInput.focus({ preventScroll: true });
-        }, isReducedMotion ? 0 : 400);
-      }
-    } else {
-      expenseToggle.setAttribute("aria-expanded", "false");
-      expenseCollapsible.setAttribute("inert", "");
-      form.querySelectorAll(".field-error").forEach(el => (el.textContent = ""));
-      submitButton.textContent = "Add Expense";
-      cancelButton.classList.add("hidden");
-
-      if (!editId) {
-        // Only blur first field when closing (not editing)
-        nameInput.blur();
-      }
-    }
+    const isReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setTimeout(() => {
+      if (accordionOpen && !editId) nameInput.focus({ preventScroll: true });
+    }, isReducedMotion ? 0 : 400);
   };
+
+  closeAccordion();
 
   if (expenseToggle) {
     expenseToggle.addEventListener("click", toggleAccordion);
@@ -732,9 +722,12 @@ function init() {
     submitButton.textContent = "Add Expense";
     cancelButton.classList.add("hidden");
 
-    // Collapse accordion
-    expenseToggle.setAttribute("aria-expanded", "false");
-    expenseCollapsible.setAttribute("inert", "");
+    // Collapse accordion and reset toggle label
+    closeAccordion();
+    const toggleLabel = expenseToggle.querySelector(".toggle-label");
+    if (toggleLabel) {
+      toggleLabel.textContent = "+ Add expense";
+    }
   };
 
   const hideToast = () => {
@@ -762,7 +755,10 @@ function init() {
     }, 3000);
   };
 
-  const startEdit = (expense) => {
+  const startEdit = (id) => {
+    const expense = loadExpenses().find(exp => exp.id === id);
+    if (!expense) return;
+
     editId = expense.id;
     nameInput.value = expense.name;
     amountInput.value = expense.amount;
@@ -775,11 +771,16 @@ function init() {
     submitButton.textContent = "Save changes";
     cancelButton.classList.remove("hidden");
 
-    // Expand accordion
-    expenseToggle.setAttribute("aria-expanded", "true");
-    expenseCollapsible.removeAttribute("inert");
-    expenseCollapsible.scrollIntoView({ behavior: "smooth", block: "start" });
-    nameInput.focus({ preventScroll: true });
+    openAccordion();
+
+    // Update toggle label to "Edit expense"
+    const toggleLabel = expenseToggle.querySelector(".toggle-label");
+    if (toggleLabel) {
+      toggleLabel.textContent = "Edit expense";
+    }
+
+    // Scroll toggle bar into view (not the collapsible panel)
+    expenseToggle.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   const showBudgetForm = () => {
@@ -1006,15 +1007,9 @@ function init() {
     expenseCollapsible.classList.add("hidden");
 
     if (selectButton) selectButton.setAttribute("aria-pressed", "true");
-    if (editId) {
-      // Cancel any edit when selection mode starts
-      editId = null;
-      expenseCollapsible.setAttribute("aria-expanded", "false");
-      expenseCollapsible.setAttribute("inert", "");
-      form.reset();
-      cancelButton.classList.add("hidden");
-      submitButton.textContent = "Add Expense";
-      form.querySelectorAll(".field-error").forEach(el => (el.textContent = ""));
+    if (accordionOpen || editId) {
+      // Cancel any open add/edit form when selection mode starts
+      resetExpenseForm();
     }
     updateBulkDeleteButton();
   };
@@ -1204,8 +1199,7 @@ function init() {
     const item = e.target.closest(".expense-item");
     if (!item) return;
 
-    const expense = loadExpenses().find(exp => exp.id === item.dataset.id);
-    if (expense) startEdit(expense);
+    startEdit(item.dataset.id);
   });
 
   undoButton.addEventListener("click", () => {
@@ -1240,6 +1234,7 @@ function init() {
     };
 
     const expenses = loadExpenses();
+    const wasEditing = Boolean(editId);
     if (editId) {
       const index = expenses.findIndex(exp => exp.id === editId);
       if (index !== -1) expenses[index] = { ...expenses[index], ...expenseData };
@@ -1255,9 +1250,7 @@ function init() {
     updateCurrentSummary(expenses);
 
     // Collapse accordion and show toast
-    expenseToggle.setAttribute("aria-expanded", "false");
-    expenseCollapsible.setAttribute("inert", "");
-    if (editId) {
+    if (wasEditing) {
       showInfoToast("Expense updated");
     } else {
       showInfoToast("Expense added");
@@ -1265,9 +1258,6 @@ function init() {
 
     // Reset form state
     resetExpenseForm();
-    if (!editId) {
-      nameInput.focus({ preventScroll: true });
-    }
   });
 
   // ── Clear invalid styling as user corrects each field ─────────────────

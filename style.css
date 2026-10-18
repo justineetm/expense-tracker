@@ -146,12 +146,15 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-.btn-theme:hover {
-  border-color: var(--color-primary);
-  background: var(--color-badge-bg);
+@media (hover: hover) {
+  .btn-theme:hover {
+    border-color: var(--color-primary);
+    background: var(--color-badge-bg);
+  }
 }
 
 .btn-theme:active {
+  background: var(--color-badge-bg);
   transform: scale(0.92);
 }
 
@@ -180,12 +183,15 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-.btn-currency:hover {
-  border-color: var(--color-primary);
-  background: var(--color-badge-bg);
+@media (hover: hover) {
+  .btn-currency:hover {
+    border-color: var(--color-primary);
+    background: var(--color-badge-bg);
+  }
 }
 
 .btn-currency:active {
+  background: var(--color-badge-bg);
   transform: scale(0.95);
 }
 
@@ -321,8 +327,15 @@ body {
   transition: background var(--transition);
 }
 
-.expense-toggle:hover {
+@media (hover: hover) {
+  .expense-toggle:hover {
+    background: var(--color-primary-hv, #4338ca);
+  }
+}
+
+.expense-toggle:active {
   background: var(--color-primary-hv, #4338ca);
+  transform: scale(0.96);
 }
 
 .expense-toggle:focus-visible {
@@ -348,6 +361,10 @@ body {
 }
 
 .expense-form-wrapper[aria-expanded="true"] {
+  grid-template-rows: 1fr;
+}
+
+.expense-form-wrapper.open {
   grid-template-rows: 1fr;
 }
 
@@ -454,8 +471,21 @@ select {
   -webkit-tap-highlight-color: transparent;
 }
 
-.btn-primary:hover  { background: #15803d; }
-.btn-primary:active { transform: scale(0.98); }
+@media (hover: hover) {
+  .btn-primary:hover {
+    background: #15803d;
+  }
+}
+
+.btn-primary:active {
+  background: #15803d;
+  transform: scale(0.98);
+}
+
+.btn-primary:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
 
 .form-actions {
   display: flex;
@@ -482,9 +512,20 @@ select {
   transition: background var(--transition), border-color var(--transition);
 }
 
-.btn-secondary:hover {
+@media (hover: hover) {
+  .btn-secondary:hover {
+    background: var(--color-badge-bg);
+    border-color: var(--color-primary);
+  }
+}
+
+.btn-secondary:active {
   background: var(--color-badge-bg);
-  border-color: var(--color-primary);
+}
+
+.btn-secondary:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
 }
 
 .btn-icon {
@@ -507,6 +548,22 @@ select {
   font-weight: 600;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) {
+  .btn-cancel:hover {
+    background: var(--color-badge-bg);
+    border-color: var(--color-primary);
+  }
+}
+
+.btn-cancel:active {
+  background: var(--color-badge-bg);
+}
+
+.btn-cancel:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
 }
 
 .hidden {
@@ -647,9 +704,11 @@ select {
   transition: background var(--transition), border-color var(--transition);
 }
 
-.currency-grid button:hover {
-  background: var(--color-badge-bg);
-  border-color: var(--color-primary);
+@media (hover: hover) {
+  .currency-grid button:hover {
+    background: var(--color-badge-bg);
+    border-color: var(--color-primary);
+  }
 }
 
 .currency-grid button:focus-visible {
@@ -705,9 +764,20 @@ select {
   color: var(--color-text);
 }
 
-.btn-bulk-secondary:hover {
+@media (hover: hover) {
+  .btn-bulk-secondary:hover {
+    background: var(--color-badge-bg);
+    border-color: var(--color-primary);
+  }
+}
+
+.btn-bulk-secondary:active {
   background: var(--color-badge-bg);
-  border-color: var(--color-primary);
+}
+
+.btn-bulk-secondary:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
 }
 
 .btn-bulk-danger {
@@ -716,8 +786,19 @@ select {
   color: #ffffff;
 }
 
-.btn-bulk-danger:hover:not(:disabled) {
-  opacity: 0.9;
+@media (hover: hover) {
+  .btn-bulk-danger:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+}
+
+.btn-bulk-danger:active {
+  background: var(--color-danger-surface-active);
+}
+
+.btn-bulk-danger:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
 }
 
 .btn-bulk-danger:disabled {
@@ -956,20 +1037,21 @@ body.selection-mode #info-toast {
   position: relative;
 }
 
-.btn-delete::after {
-  content: "";
-  position: absolute;
-  inset: -6px;
-}
-
-.btn-delete:hover {
-  background: var(--color-danger-surface);
-  color: var(--color-error);
+@media (hover: hover) {
+  .btn-delete:hover {
+    background: var(--color-danger-surface);
+    color: var(--color-error);
+  }
 }
 
 .btn-delete:active {
-  transform: scale(0.88);
   background: var(--color-danger-surface-active);
+  transform: scale(0.88);
+}
+
+.btn-delete:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
 }
 
 /* =============================================

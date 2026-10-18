@@ -45,7 +45,7 @@ PeraLog is a client-side expense tracker PWA. All data is stored in localStorage
 - Weekly & monthly summary cards with budget progress bar (green/orange/red thresholds)
 - Form validation with inline error messages
 - Dark/light theme toggle (persisted in localStorage)
-- Service Worker: `peralog-v9` cache for offline support
+- Service Worker: `peralog-v10` cache for offline support
 
 
 ## Collapsible Add Expense Accordion
@@ -57,9 +57,19 @@ PeraLog is a client-side expense tracker PWA. All data is stored in localStorage
 - On open, focuses `#item-name` with `{ preventScroll: true }` after a 400ms timeout (or immediately if `prefers-reduced-motion` is on).
 - On successful save: collapses accordion, shows `#info-toast` ("Expense added" / "Expense updated" for edits).
 - Validation errors keep the form open; error messages and Save button are not clipped.
-- Edit mode: tapping a row expands the form, pre-fills fields, scrolls into view, and changes toggle label to "Edit expense".
+- Edit mode: tapping a row uses the shared accordion opener, pre-fills item name, price, quantity, date, and category, scrolls the toggle bar into view, and changes its label to "Edit expense" without focusing an input or opening the mobile keyboard.
 - Cancel button collapses accordion and resets the form/labels.
 - Tapping the toggle while editing cancels the edit and returns to add mode.
+
+### Mobile Tap & Focus Fixes
+- Root cause: `.expense-toggle` and `.btn-primary` had `transition: background` but no `:active` background rule. On mobile, browser default `:active` styling (white background) appeared "stuck" after tap.
+- Fixed by adding explicit `:active` background colors to all buttons (theme toggle, currency, accordion toggle, primary, secondary, bulk, delete, cancel).
+- All `:hover` rules moved inside `@media (hover: hover)` so touch devices never get a stuck hover state.
+- All `:focus-visible` rules use outline only (no background change).
+- Text color contrast verified in light and dark themes.
+- Added `-webkit-tap-highlight-color: transparent` to all buttons so no native tap highlight flash on mobile.
+- Accordion state is centralized in `openAccordion()` / `closeAccordion()`: both update the wrapper's `open` class, both `aria-expanded` values, `inert`, and the `accordionOpen` flag together.
+- Tapping an expense row now auto-opens the accordion if closed, updates the toggle label to "Edit expense", and scrolls the toggle bar into view without focusing the Item Name field.
 - Selection mode hides the toggle bar entirely; if selection starts while editing, the edit is cancelled and the form collapsed first.
 ## Files
 - `index.html` — HTML structure
