@@ -521,9 +521,13 @@ function renderChart(expenses, categoryFilter = "", searchTerm = "") {
     slice.setAttribute("cx", "16");
     slice.setAttribute("cy", "16");
     slice.setAttribute("stroke", color);
-    slice.setAttribute("stroke-dasharray", `${percent} 100`);
+    slice.setAttribute("stroke-dasharray", "0 100");
     slice.setAttribute("stroke-dashoffset", `${cumulativePercent}`);
     svg.appendChild(slice);
+
+    setTimeout(() => {
+      slice.setAttribute("stroke-dasharray", `${percent} 100`);
+    }, 50);
 
     cumulativePercent += percent;
 
@@ -986,9 +990,9 @@ function init() {
   const showInfoToast = (msg, durationMs = 3000) => {
     if (infoToastTimer) clearTimeout(infoToastTimer);
     if (infoToastMessage) infoToastMessage.textContent = msg;
-    if (infoToast) infoToast.classList.remove("hidden");
+    if (infoToast) infoToast.classList.add("toast-visible");
     infoToastTimer = setTimeout(() => {
-      if (infoToast) infoToast.classList.add("hidden");
+      if (infoToast) infoToast.classList.remove("toast-visible");
       infoToastTimer = null;
     }, durationMs);
   };
@@ -1554,11 +1558,21 @@ function init() {
       const index = expenses.findIndex(exp => exp.id === btn.dataset.id);
       if (index === -1) return;
 
-      const [deletedExpense] = expenses.splice(index, 1);
-      saveExpenses(expenses);
-      renderCurrentList(expenses);
-      updateCurrentSummary(expenses);
-      showToast([{ expense: deletedExpense, originalIndex: index }], "Expense deleted.");
+      const itemEl = btn.closest(".expense-item");
+      const doDelete = () => {
+        const [deletedExpense] = expenses.splice(index, 1);
+        saveExpenses(expenses);
+        renderCurrentList(expenses);
+        updateCurrentSummary(expenses);
+        showToast([{ expense: deletedExpense, originalIndex: index }], "Expense deleted.");
+      };
+
+      if (itemEl) {
+        itemEl.classList.add("removing");
+        setTimeout(doDelete, 200);
+      } else {
+        doDelete();
+      }
       return;
     }
 

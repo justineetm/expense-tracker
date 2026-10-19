@@ -178,7 +178,8 @@ body {
 
 .btn-theme:active {
   background: var(--color-badge-bg);
-  transform: scale(0.92);
+  transform: scale(0.97);
+  transition: transform 0.1s ease;
 }
 
 .btn-theme:focus-visible {
@@ -215,7 +216,8 @@ body {
 
 .btn-currency:active {
   background: var(--color-badge-bg);
-  transform: scale(0.95);
+  transform: scale(0.97);
+  transition: transform 0.1s ease;
 }
 
 .btn-currency:focus-visible {
@@ -587,7 +589,8 @@ body {
 }
 
 .quick-add-chip:active {
-  transform: scale(0.96);
+  transform: scale(0.97);
+  transition: transform 0.1s ease;
 }
 
 .quick-add-chip:focus-visible {
@@ -777,7 +780,8 @@ select {
 
 .btn-ghost:active {
   background: var(--color-badge-bg);
-  transform: scale(0.92);
+  transform: scale(0.97);
+  transition: transform 0.1s ease;
 }
 
 .btn-ghost:focus-visible {
@@ -840,7 +844,9 @@ select {
   width: calc(100% - 2rem);
   max-width: 408px;
   box-sizing: border-box;
-  transform: translateX(-50%);
+  transform: translate(-50%, 150%);
+  opacity: 0;
+  pointer-events: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -853,7 +859,13 @@ select {
   text-align: center;
   font-size: 0.95rem;
   font-weight: 600;
-  transition: bottom var(--transition);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+#info-toast.toast-visible {
+  transform: translate(-50%, 0);
+  opacity: 1;
+  pointer-events: auto;
 }
 
 #toast {
@@ -1260,7 +1272,7 @@ body.selection-mode #info-toast {
   border-bottom: 1px solid var(--color-border);
   border-radius: 0;
   background: transparent;
-  animation: slide-in 0.22s ease;
+  animation: slideFadeIn 250ms ease-out;
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
@@ -1271,9 +1283,22 @@ body.selection-mode #info-toast {
   border-bottom: none;
 }
 
-@keyframes slide-in {
-  from { opacity: 0; transform: translateY(-6px); }
+@keyframes slideFadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+.expense-item.removing {
+  animation: shrinkFadeOut 200ms ease forwards;
+}
+
+@keyframes shrinkFadeOut {
+  to { opacity: 0; transform: scale(0.92); }
+}
+
+.expense-item:active {
+  transform: scale(0.97);
+  transition: transform 0.1s ease;
 }
 
 .expense-category-circle {
@@ -1602,7 +1627,7 @@ body.selection-mode #info-toast {
   fill: transparent;
   stroke-width: 4;
   stroke-linecap: round;
-  transition: stroke-dasharray 0.4s ease, stroke-dashoffset 0.4s ease;
+  transition: stroke-dasharray 1s ease-out;
 }
 
 .chart-legend {
