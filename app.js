@@ -8,6 +8,7 @@ const THEME_STORAGE_KEY = "expense_tracker_theme";
 const BUDGET_STORAGE_KEY = "expense_budget";
 const CURRENCY_STORAGE_KEY = "peralog_currency";
 const BACKUP_STORAGE_KEY = "peralog_last_backup";
+const BACKUP_METHOD_STORAGE_KEY = "peralog_last_backup_method";
 const SNOOZE_STORAGE_KEY = "peralog_backup_snooze";
 
 /** Currency code -> human-readable name for the picker dialog. */
@@ -982,14 +983,14 @@ function init() {
     toastTimer = setTimeout(hideToast, 6000);
   };
 
-  const showInfoToast = (msg) => {
+  const showInfoToast = (msg, durationMs = 3000) => {
     if (infoToastTimer) clearTimeout(infoToastTimer);
     if (infoToastMessage) infoToastMessage.textContent = msg;
     if (infoToast) infoToast.classList.remove("hidden");
     infoToastTimer = setTimeout(() => {
       if (infoToast) infoToast.classList.add("hidden");
       infoToastTimer = null;
-    }, 3000);
+    }, durationMs);
   };
 
   const startEdit = (id) => {
@@ -1092,10 +1093,14 @@ function init() {
     const file = new File([csvContent], `peralog-backup-${getTodayISO()}.csv`, { type: "text/csv" });
     const now = Date.now();
 
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    // Desktop → real download; touch → phone share
+    const preferShare = window.matchMedia("(pointer: coarse)").matches && navigator.canShare && navigator.canShare({ files: [file] });
+    if (preferShare) {
       try {
         await navigator.share({ files: [file] });
         localStorage.setItem(BACKUP_STORAGE_KEY, String(now));
+        localStorage.setItem(BACKUP_METHOD_STORAGE_KEY, "shared");
+        showInfoToast("Shared. Make sure the file arrived where you sent it.", 5000);
         renderBackupBanner();
         return;
       } catch (err) {
@@ -1107,6 +1112,7 @@ function init() {
     }
 
     // Fallback: download link
+    showInfoToast(`Backup downloaded: peralog-backup-${getTodayISO()}.csv. Check your Downloads folder.`, 5000);
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -1118,6 +1124,7 @@ function init() {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
     localStorage.setItem(BACKUP_STORAGE_KEY, String(now));
+    localStorage.setItem(BACKUP_METHOD_STORAGE_KEY, "downloaded");
     renderBackupBanner();
   }
 
@@ -1148,6 +1155,27 @@ function init() {
     return true;
   }
 
+  function renderLastBackup() {
+    const el = document.getElementById("last-backup");
+    if (!el) return;
+    const expenses = loadExpenses();
+    if (expenses.length === 0) {
+      el.classList.add("hidden");
+      return;
+    }
+    const ts = localStorage.getItem(BACKUP_STORAGE_KEY);
+    if (!ts) {
+      el.textContent = "Last backup: never";
+      el.classList.remove("hidden");
+      return;
+    }
+    const method = localStorage.getItem(BACKUP_METHOD_STORAGE_KEY);
+    const dateStr = new Date(Number(ts)).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+    const methodSuffix = method ? ` · ${method}` : "";
+    el.textContent = `Last backup: ${dateStr}${methodSuffix}`;
+    el.classList.remove("hidden");
+  }
+
   function renderBackupBanner() {
     const banner = document.getElementById("backup-banner");
     if (!banner) return;
@@ -1157,6 +1185,7 @@ function init() {
     } else {
       banner.classList.add("hidden");
     }
+    renderLastBackup();
   }
 
   // Backup banner buttons

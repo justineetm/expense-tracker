@@ -1507,6 +1507,15 @@ body.selection-mode #info-toast {
   font-weight: normal;
 }
 
+/* Last backup line, rendered dynamically by renderLastBackup() */
+.last-backup {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  margin: 0;
+  line-height: 1.3;
+  padding: 0 1.25rem 0.5rem;
+}
+
 /* Row 1 action group: Ghost icon buttons side-by-side. */
 .list-actions {
   display: flex;
@@ -1673,5 +1682,9 @@ body.selection-mode #info-toast {
 
   .list-controls {
     padding: 0 1rem 1rem;
+  }
+
+  .last-backup {
+    padding: 0 1rem 0.5rem;
   }
 }
